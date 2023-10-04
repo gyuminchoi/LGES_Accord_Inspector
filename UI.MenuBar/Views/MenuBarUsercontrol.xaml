@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="UI.MenuBar.Views.MenuBarUsercontrol"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:UI.MenuBar.Views"
+             
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:viewModels="clr-namespace:UI.MenuBar.ViewModels"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             d:DataContext="{d:DesignInstance Type=viewModels:MenuBarViewModel, IsDesignTimeCreatable=False}"
+             
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel Orientation="Horizontal" >
+        <!--<Button Width="90" Height="90" Command="{Binding BtnLoginClick}">
+            <StackPanel>
+                <iconPacks:PackIconVaadinIcons Kind="Key" HorizontalAlignment="Center" Width="50" Height="50" />
+                <Label Content="Login" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Button>-->
+        <Button Width="90" Height="90">
+            <StackPanel>
+                <iconPacks:PackIconMaterial Kind="DatabaseSearchOutline" HorizontalAlignment="Center" Width="50" Height="50"/>
+                <Label Content="History" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+        <!--<Button Width="90" Height="90">
+            <StackPanel>
+                <iconPacks:PackIconIonicons Kind="AnalyticsMD" HorizontalAlignment="Center" Width="50" Height="50" />
+                <Label Content="Simulation" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Button>-->
+        <Button Width="90" Height="90" Command="{Binding BtnLiveCamClick}">
+            <StackPanel>
+                <iconPacks:PackIconMaterial Kind="CameraWireless" HorizontalAlignment="Center" Width="50" Height="50" />
+                <Label Content="Live Cam" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+        <Button Width="90" Height="90" Command="{Binding BtnSettingClick}">
+            <StackPanel>
+                <iconPacks:PackIconSimpleIcons Kind="Svgo" HorizontalAlignment="Center" Width="50" Height="50"/>
+                <Label Content="Setting" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+        <Button Width="90" Height="90">
+            <StackPanel>
+                <iconPacks:PackIconFontAwesome Kind="FolderOpenSolid" HorizontalAlignment="Center" Width="50" Height="50" />
+                <Label Content="Directory" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+        <Button Width="90" Height="90">
+            <StackPanel>
+                <iconPacks:PackIconModern Kind="Reset" HorizontalAlignment="Center" Width="50" Height="50"/>
+                <Label Content="Reset" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+    </StackPanel>
+</UserControl>
