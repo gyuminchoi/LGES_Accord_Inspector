@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Service.IO.Services
 {
-    internal class IOManager : LazySingleton<IOManager>, IDisposable
+    public class IOManager : LazySingleton<IOManager>, IDisposable
     {
         private readonly LogWrite _logWrite = LogWrite.Instance;
         private CrevisFnIO _fnIO = new CrevisFnIO();
@@ -34,9 +34,8 @@ namespace Service.IO.Services
         ~IOManager() => Dispose();
 
         //Open하면 init, open device까지 진행
-        public void Open(string ipAddress)
+        public bool Open(string ipAddress)
         {
-            _logWrite.DefaultSet();
             try
             {
                 if (IsOpen)
@@ -142,11 +141,13 @@ namespace Service.IO.Services
 
                 }
                 IsOpen = true;
+                return true;
             }
-            catch
+            catch (Exception err)
             {
+                _logWrite?.Error(err, true, false);
                 Close();
-                throw;
+                return false;
             }
         }
 
@@ -295,7 +296,6 @@ namespace Service.IO.Services
                 DInputs.Add(new IOSlot
                 {
                     DataBits = dbs,
-                    IOType = EIOType.DigitalInput,
                     Index = inputCount,
                     Size = bitSize,
                     Name = name
@@ -322,7 +322,6 @@ namespace Service.IO.Services
                 DOutputs.Add(new IOSlot
                 {
                     DataBits = dbs,
-                    IOType = EIOType.DigitalOutput,
                     Index = outputCount,
                     Size = bitSize,
                     Name = name
@@ -351,7 +350,6 @@ namespace Service.IO.Services
             {
                 DataBytes = new byte[inputByteSize],
                 Index = inputCount,
-                IOType = EIOType.AnalogInput,
                 //Size = inputByteSize % 2 == 0 ? inputByteSize / 2 : inputByteSize / 2 + 1,
                 Size = inputByteSize,
                 Name = name.Substring(0, 7)
@@ -394,7 +392,6 @@ namespace Service.IO.Services
             {
                 DataBytes = new byte[byteSize],
                 Index = outputCount,
-                IOType = EIOType.AnalogOutput,
                 //Size = byteSize % 2 == 0 ? byteSize / 2 : byteSize / 2 + 1,
                 Size = byteSize,
                 Name = name.Substring(0, 7)
@@ -467,6 +464,28 @@ namespace Service.IO.Services
                 throw new FnIOException(status, EFnIOError.FnIOWriteOutputByteFail);
         }
 
+        public void WriteThread()
+        {
+            Thread testThread = new Thread(() => 
+            {
+                while (true)
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        WriteOutputBit(0, i, true);
+                        Thread.Sleep(300);
+                    }
+
+                    for (int i = 0; i < 8; i++)
+                    {
+                        WriteOutputBit(0, i, false);
+                        Thread.Sleep(300);
+                    }
+                }
+            });
+            testThread.Start();
+        }
+
         private void UpdateThreadStart()
         {
             _fnIOSignalCheckThread = new Thread(new ThreadStart(() =>
@@ -480,8 +499,8 @@ namespace Service.IO.Services
                         {
                             DInputUpdate();
                             DOutputUpdate();
-                            AInputUpdate();
-                            AOutputUpdate();
+                            //AInputUpdate();
+                            //AOutputUpdate();
 
                             errCount = 0;
                             Thread.Sleep(30);
@@ -511,15 +530,15 @@ namespace Service.IO.Services
             Thread.Sleep(30);
             try { Close(); } catch { }
             //TODO : 왜 터지누?
-            try
-            {
-                if (_hDevice != null) { Marshal.FreeHGlobal(_hDevice); }
-                if (_hSystem != null) { Marshal.FreeHGlobal(_hSystem); }
-            }
-            catch (Exception err)
-            {
-                _logWrite?.Error(err);
-            }
+            //try
+            //{
+            //    if (_hDevice != null) { Marshal.FreeHGlobal(_hDevice); }
+            //    if (_hSystem != null) { Marshal.FreeHGlobal(_hSystem); }
+            //}
+            //catch (Exception err)
+            //{
+            //    _logWrite?.Error(err);
+            //}
         }
     }
 }

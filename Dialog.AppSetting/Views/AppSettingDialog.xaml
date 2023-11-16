@@ -1,0 +1,116 @@
+﻿<UserControl x:Class="Dialog.AppSetting.Views.AppSettingDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Dialog.AppSetting.Views"
+             
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:viewModels="clr-namespace:Dialog.AppSetting.ViewModels"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             d:DataContext="{d:DesignInstance Type=viewModels:AppSettingViewModel, IsDesignTimeCreatable=False}"
+             
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="800" Background="#333333">
+    <prism:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
+            <Setter Property="ResizeMode" Value="NoResize"/>
+            <Setter Property="WindowStyle" Value="SingleBorderWindow"/>
+            <Setter Property="Width" Value="700"/>
+            <Setter Property="Height" Value="600"/>
+            <Setter Property="Icon" Value="\BarcodeLabel.Core;component\Images\Checkbox_Logo-9.png"/>
+        </Style>
+    </prism:Dialog.WindowStyle>
+    <Grid>
+        <TabControl Margin="10" Background="#333333">
+            <TabControl.Style>
+                <Style/>
+            </TabControl.Style>
+            <TabItem Header="Image Setting" Background="#333333" Foreground="LightGray">
+                <!-- 이미지 저장 여부 -->
+                <StackPanel Orientation="Vertical" VerticalAlignment="Top">
+                    <GroupBox Margin="5" Header="Save Whether">
+                        <GroupBox.Style>
+                            <Style TargetType="GroupBox">
+                                <Setter Property="BorderBrush" Value="Black"/>
+                                <Setter Property="BorderThickness" Value="2"/>
+                                <Setter Property="Foreground" Value="LightGray"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </GroupBox.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Margin="5" Orientation="Horizontal">
+                                <TextBlock Margin="5" VerticalAlignment="Center" Text="Overlay Image"/>
+                                <CheckBox VerticalAlignment="Center" 
+                                          Foreground="LightGray" 
+                                          IsChecked="{Binding SettingManager.AppSetting.ImageSetting.IsSaveOverlay}"/>
+                            </StackPanel>
+
+                            <StackPanel Margin="5" Orientation="Horizontal">
+                                <TextBlock Margin="5" VerticalAlignment="Center" Text="Original Image"/>
+                                <CheckBox VerticalAlignment="Center" 
+                                          Foreground="LightGray"
+                                          IsChecked="{Binding SettingManager.AppSetting.ImageSetting.IsSaveOriginal}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Margin="5" Header="Save Path">
+                        <GroupBox.Style>
+                            <Style TargetType="GroupBox">
+                                <Setter Property="BorderBrush" Value="Black"/>
+                                <Setter Property="BorderThickness" Value="2"/>
+                                <Setter Property="Foreground" Value="LightGray"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </GroupBox.Style>
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.8*"/>
+                                <ColumnDefinition Width="0.2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" 
+                                     IsReadOnly="True"
+                                     Text="{Binding SettingManager.AppSetting.ImageSetting.SavePath}"/>
+                            <Button Grid.Column="1" 
+                                    HorizontalAlignment="Center" Width="70" Content="..."
+                                    Command="{Binding BtnSelectImageSavePathCommand}"/>
+                        </Grid>
+                    </GroupBox>
+                    
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="IO Setting" Background="#333333" Foreground="LightGray">
+                <StackPanel>
+                    <GroupBox Margin="5" Header="IP Address">
+                        <GroupBox.Style>
+                            <Style TargetType="GroupBox">
+                                <Setter Property="BorderBrush" Value="Black"/>
+                                <Setter Property="BorderThickness" Value="2"/>
+                                <Setter Property="Foreground" Value="LightGray"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </GroupBox.Style>
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.5*"/>
+                                <ColumnDefinition Width="0.5*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" HorizontalAlignment="Left" Width="300" />
+                        </Grid>
+                    </GroupBox>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Vision Pro Setting" Background="#333333" Foreground="LightGray">
+
+            </TabItem>
+
+            <TabItem Header="Data Setting" Background="#333333" Foreground="LightGray">
+
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

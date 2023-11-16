@@ -13,64 +13,77 @@
              
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Margin="0,0,5,0" BorderBrush="DarkGray" BorderThickness="2">
-                <Grid>
-                    <StackPanel>
-                        <TextBlock Margin="5"
-                                   FontSize="16" Foreground="Yellow" 
-                                   Text="상부"/>
-                        <TextBlock Margin="5"
-                                   FontSize="16" Foreground="Yellow" 
-                                   Text="Quantity found : "/>
-                    </StackPanel>
-                    <Image Source="C:\Users\TSgyuminChoi\Desktop\대원제약 검토 자료\20230904 대원제약 라벨\MG-A201R-5\8mm 2등분 3차\4.0  2.bmp"/>
-                </Grid>
-            </Border>
-                
-            <Border Grid.Column="1" Margin="5,0,0,0" BorderBrush="DarkGray" BorderThickness="2">
-                <Grid>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <!-- Top Viewer -->
+            <ColumnDefinition/>
+            <!-- Bottom Viewer -->
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Top Viewer -->
+        <Border Grid.Column="0" Margin="0,0,5,0" BorderBrush="DarkGray" BorderThickness="2">
+            <Grid>
                 <StackPanel>
+                    <!-- Info -->
                     <TextBlock Margin="5"
-                                   FontSize="16" Foreground="Yellow" 
-                                   Text="하부"/>
-                    <TextBlock Margin="5"
-                                   FontSize="16" Foreground="Yellow" 
-                                   Text="Quantity found : "/>
+                               FontSize="18" Foreground="#9EF048" FontWeight="Bold"
+                               Text="상부"/>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="5"
+                                           FontSize="14" Foreground="#9EF048" 
+                                           Text="Quantity found : "/>
+                        <TextBlock Margin="5"
+                                           FontSize="14" Foreground="#9EF048" 
+                                           Text="{Binding TopQuantity}"/>
                     </StackPanel>
-                    <Image Source="C:\Users\TSgyuminChoi\Desktop\대원제약 검토 자료\20230904 대원제약 라벨\MG-A201R-5\거치대 이미지\11.bmp"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="5"
+                                           FontSize="14" Foreground="#9EF048" 
+                                           Text="Frame Count : "/>
+                        <TextBlock Margin="5"
+                                           FontSize="14" Foreground="#9EF048" 
+                                           Text="{Binding TopFrameCount}"/>
+                    </StackPanel>
+                </StackPanel>
+                <!-- Image -->
+                <Image Panel.ZIndex="0" Source="{Binding TopOriginImg}"/>
+                <Image Panel.ZIndex="1" Source="{Binding TopOverlayImg}"/>
             </Grid>
-            </Border>
-            <!--<Border Panel.ZIndex="1">
-                    <Border.Style>
-                        <Style>
-                            <Setter Property="Border.Visibility" Value="Visible"/>
-                            <Setter Property="Border.BorderThickness" Value="10"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding AppInspectionDataRepo.InspectionData.ViewerData.Judgment}" Value="true">
-                                    <Setter Property="Border.BorderBrush" Value="#9EF048"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding AppInspectionDataRepo.InspectionData.ViewerData.Judgment}" Value="false">
-                                    <Setter Property="Border.BorderBrush" Value="#F44848"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
-                    <Grid>
-                        <Image Name="OriginImage" Source="{Binding AppInspectionDataRepo.InspectionData.ViewerData.OriginImage}" Panel.ZIndex="0" Stretch="Fill"/>
-                        <Image Name="OverlayImage" Source="{Binding AppInspectionDataRepo.InspectionData.ViewerData.OverlayImage}" Panel.ZIndex="1"/>
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Panel.ZIndex="2">
-                            <TextBlock Text="{Binding AppInspectionDataRepo.InspectionData.ViewerData.Id}" Foreground="White" FontSize="18" Opacity="0.6"/>
-                            <TextBlock Text=" / " Foreground="White"  FontSize="18" Opacity="0.6"/>
-                            <TextBlock Text="{Binding AppInspectionDataRepo.InspectionData.ViewerData.Date}" Foreground="White"  FontSize="18" Opacity="0.6"/>
-                        </StackPanel>
-                    </Grid>
-                </Border>-->
-        </Grid>
-    
+        </Border>
+        
+        <!-- Bottom Viewer -->
+        <Border Grid.Column="1" Margin="5,0,0,0" BorderBrush="DarkGray" BorderThickness="2">
+            <Grid>
+                <StackPanel>
+                    <!-- Info -->
+                    <TextBlock Margin="5"
+                               FontSize="18" Foreground="#9EF048" FontWeight="Bold"
+                               Text="하부"/>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="5"
+                                           FontSize="14" Foreground="#9EF048" 
+                                           Text="Quantity found : "/>
+                        <TextBlock Margin="5"
+                                           FontSize="14" Foreground="#9EF048" 
+                                           Text="{Binding BottomQuantity}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="5"
+                                           FontSize="14" Foreground="#9EF048" 
+                                           Text="Frame Count : "/>
+                        <TextBlock Margin="5"
+                                           FontSize="14" Foreground="#9EF048" 
+                                           Text="{Binding BottomFrameCount}"/>
+                    </StackPanel>
+                </StackPanel>
+                <!-- Image -->
+                <Image Panel.ZIndex="0" Source="{Binding BottomOriginImg}"/>
+                <Image Panel.ZIndex="1" Source="{Binding BottomOverlayImg}"/>
+            </Grid>
+        </Border>
+    </Grid>
 </UserControl>

@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Service.IO
+namespace UI.Controller.Models
 {
-    public class Class1
+    public enum EInspectionState
     {
+        Stopped,
+        Running,
+        Error,
     }
 }

@@ -24,7 +24,7 @@
         <Button Width="90" Height="90">
             <StackPanel>
                 <iconPacks:PackIconMaterial Kind="DatabaseSearchOutline" HorizontalAlignment="Center" Width="50" Height="50"/>
-                <Label Content="History" HorizontalAlignment="Center"/>
+                <Label FontSize="12" Content="History" HorizontalAlignment="Center"/>
             </StackPanel>
         </Button>
         <!--<Button Width="90" Height="90">
@@ -33,28 +33,32 @@
                 <Label Content="Simulation" HorizontalAlignment="Center"/>
             </StackPanel>
         </Button>-->
-        <Button Width="90" Height="90" Command="{Binding BtnLiveCamClick}">
+        <Button Width="90" Height="90" 
+                IsEnabled="{Binding IsEnabledLiveCam}"
+                Command="{Binding BtnLiveCamCommand}">
             <StackPanel>
                 <iconPacks:PackIconMaterial Kind="CameraWireless" HorizontalAlignment="Center" Width="50" Height="50" />
-                <Label Content="Live Cam" HorizontalAlignment="Center"/>
+                <Label FontSize="12" Content="Live Cam" HorizontalAlignment="Center"/>
             </StackPanel>
         </Button>
-        <Button Width="90" Height="90" Command="{Binding BtnSettingClick}">
+        <Button Width="90" Height="90" 
+                IsEnabled="{Binding IsEnabledSetting}"
+                Command="{Binding BtnSettingCommand}">
             <StackPanel>
                 <iconPacks:PackIconSimpleIcons Kind="Svgo" HorizontalAlignment="Center" Width="50" Height="50"/>
-                <Label Content="Setting" HorizontalAlignment="Center"/>
+                <Label FontSize="12" Content="Setting" HorizontalAlignment="Center"/>
             </StackPanel>
         </Button>
-        <Button Width="90" Height="90">
+        <Button Width="90" Height="90" Command="{Binding BtnDirectoryCommmand}">
             <StackPanel>
                 <iconPacks:PackIconFontAwesome Kind="FolderOpenSolid" HorizontalAlignment="Center" Width="50" Height="50" />
-                <Label Content="Directory" HorizontalAlignment="Center"/>
+                <Label FontSize="12" Content="Directory" HorizontalAlignment="Center"/>
             </StackPanel>
         </Button>
         <Button Width="90" Height="90">
             <StackPanel>
                 <iconPacks:PackIconModern Kind="Reset" HorizontalAlignment="Center" Width="50" Height="50"/>
-                <Label Content="Reset" HorizontalAlignment="Center"/>
+                <Label FontSize="12" Content="Reset" HorizontalAlignment="Center"/>
             </StackPanel>
         </Button>
     </StackPanel>

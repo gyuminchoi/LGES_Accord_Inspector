@@ -4,13 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:UI.ConnectState.Views"
+             
+             xmlns:con="clr-namespace:UI.ConnectState.Services.ConverterService"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:viewModels="clr-namespace:UI.ConnectState.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance Type=viewModels:ConnectStateViewModel, IsDesignTimeCreatable=False}"
+             
              mc:Ignorable="d" 
              d:DesignHeight="100" d:DesignWidth="400">
+    <UserControl.Resources>
+        <con:StateToColorConverter x:Key="StateToColorConverter"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="100"/>
@@ -19,28 +25,29 @@
             <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
 
-        <Button Grid.Column="0" BorderBrush="Transparent" Background="Transparent" Command="{Binding BtnClickCommand}">
+        <Button Grid.Column="0" BorderBrush="Transparent" Background="Transparent" Command="{Binding BtnCameraCommand}">
             <StackPanel>
                 <Label  VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="LightGray" Content="Camera"/>
-                <Ellipse Width="40" Height="40" Fill="#9EF048"/>
+                <Ellipse Width="40" Height="40" Fill="{Binding IsCameraState, Converter={StaticResource StateToColorConverter}}">
+                </Ellipse>
             </StackPanel>
         </Button>
 
-        <Button Grid.Column="1" BorderBrush="Transparent" Background="Transparent" Command="{Binding BtnIOStateClickCommand}">
+        <Button Grid.Column="1" BorderBrush="Transparent" Background="Transparent" Command="{Binding BtnIOStateCommand}">
             <StackPanel>
                 <Label VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="LightGray" Content="I / O"/>
                 <Ellipse Width="40" Height="40" Fill="#9EF048"/>
             </StackPanel>
         </Button>
 
-        <Button Grid.Column="2" BorderBrush="Transparent" Background="Transparent" Command="{Binding BtnClickCommand}">
+        <Button Grid.Column="2" BorderBrush="Transparent" Background="Transparent" Command="{Binding BtnSensorCommand}">
             <StackPanel>
                 <Label VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="LightGray" Content="Sensor"/>
                 <Ellipse Width="40" Height="40" Fill="#9EF048"/>
             </StackPanel>
         </Button>
 
-        <Button Grid.Column="3" BorderBrush="Transparent" Background="Transparent" Command="{Binding BtnClickCommand}">
+        <Button Grid.Column="3" BorderBrush="Transparent" Background="Transparent" Command="{Binding BtnVisionProCommand}">
             <StackPanel>
                 <Label VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="LightGray" Content="VisionPro"/>
                 <Ellipse Width="40" Height="40" Fill="#9EF048"/>

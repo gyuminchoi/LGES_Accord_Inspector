@@ -1,4 +1,6 @@
-﻿using Prism.Commands;
+﻿using BarcodeLabel.Core.Events;
+using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using PrismTemplate.Services.TimeServices;
 using Service.Logger.Services;
@@ -17,6 +19,7 @@ namespace BarcodeLabel.Main.ViewModels
         private LogWrite _logWrite = LogWrite.Instance;
         private WindowState _windowState;
         private SystemTimeService _timeService = new SystemTimeService();
+        private IEventAggregator _eventAggregator;
         private string _version;
 
         public WindowState WindowState { get => _windowState; set => SetProperty(ref _windowState, value); }
@@ -27,7 +30,11 @@ namespace BarcodeLabel.Main.ViewModels
         public DelegateCommand<CancelEventArgs> ClosingCommand => new DelegateCommand<CancelEventArgs>(OnClosing);
         public DelegateCommand BtnMinimizeCommand => new DelegateCommand(OnMinimize);
 
-        public MainViewModel() { }
+        public MainViewModel(IEventAggregator ea) 
+        {
+            _eventAggregator = ea;
+            
+        }
 
         private void OnLoaded()
         {
@@ -42,6 +49,7 @@ namespace BarcodeLabel.Main.ViewModels
             {
                 // TODO : Dispose 구현해야함
                 _logWrite?.Info("Application Closing...");
+                _eventAggregator.GetEvent<AppClosingEvent>().Publish();
             }
             else
             {

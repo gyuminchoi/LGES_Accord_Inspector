@@ -1,0 +1,20 @@
+﻿<mah:MetroWindow x:Class="Dialog.MahAppsThema.Views.MahAppsThemaDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Dialog.MahAppsThema.Views"
+        
+        xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:viewModels="clr-namespace:Dialog.MahAppsThema.ViewModels"
+        xmlns:prism="http://prismlibrary.com/"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        d:DataContext="{d:DesignInstance Type=viewModels:MahAppsThemaViewModel, IsDesignTimeCreatable=False}"
+            
+        mc:Ignorable="d"
+        Title="MahAppsThemaDialog" Height="850" Width="1200" WindowStartupLocation="CenterScreen">
+    <Grid>
+        
+    </Grid>
+</mah:MetroWindow>

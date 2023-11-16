@@ -1,0 +1,10 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/CrevisService.LayoutSupport;component/Themes/Units/ModernOpacityRadioButton.xaml"/>
+        <ResourceDictionary Source="/CrevisService.LayoutSupport;component/Themes/Units/ModernPasswordBox.xaml"/>
+        <ResourceDictionary Source="/CrevisService.LayoutSupport;component/Themes/Units/ModernButton.xaml"/>
+        <ResourceDictionary Source="/CrevisService.LayoutSupport;component/Themes/Units/WrappingListBox.xaml"/>
+        <ResourceDictionary Source="/CrevisService.LayoutSupport;component/Themes/Units/IsConnectedButton.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

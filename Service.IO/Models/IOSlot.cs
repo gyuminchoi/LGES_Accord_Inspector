@@ -6,14 +6,12 @@ namespace Service.IO.Models
     {
         #region Fields For Properties
         private string _name;
-        private EIOType _ioType;
         private BitData[] _dataBits;
         private int _index;
         private int _size;
         private byte[] _dataBytes;
         #endregion 
         public string Name { get => _name; set => SetProperty(ref _name, value); }
-        public EIOType IOType { get => _ioType; set => SetProperty(ref _ioType, value); }
         public BitData[] DataBits { get => _dataBits; set => SetProperty(ref _dataBits, value); }
         // Test
         public byte[] DataBytes { get => _dataBytes; set => SetProperty(ref _dataBytes, value); }

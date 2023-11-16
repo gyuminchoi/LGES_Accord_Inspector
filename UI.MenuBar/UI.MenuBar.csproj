@@ -31,7 +31,28 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
+      <HintPath>..\packages\ControlzEx.4.4.0\lib\net462\ControlzEx.dll</HintPath>
+    </Reference>
     <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.11.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
     </Reference>
@@ -141,8 +162,11 @@
       <HintPath>..\packages\Prism.Wpf.8.1.97\lib\net47\Prism.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -191,6 +215,23 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\BarcodeLabel.Core\BarcodeLabel.Core.csproj">
+      <Project>{70C5B44D-0A6C-4679-9545-9F8D0EB18697}</Project>
+      <Name>BarcodeLabel.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dialog.AppSetting\Dialog.AppSetting.csproj">
+      <Project>{A4ACC0D0-DAC5-4192-AFCD-7755E8C52871}</Project>
+      <Name>Dialog.AppSetting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dialog.DirectorySelecton\Dialog.DirectorySelecton.csproj">
+      <Project>{75BEFAF2-189A-4B47-82BF-7F6A9B366316}</Project>
+      <Name>Dialog.DirectorySelecton</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dialog.LiveCam\Dialog.LiveCam.csproj">
+      <Project>{42BC2DA0-E7D8-4F5A-BCCB-82BA7850FFC5}</Project>
+      <Name>Dialog.LiveCam</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

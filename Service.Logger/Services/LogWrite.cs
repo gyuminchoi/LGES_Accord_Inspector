@@ -32,7 +32,7 @@ namespace Service.Logger.Services
 
         // TODO : 로그 버전 정보 부분.
         public string Version { get; set; } = "1.3.0";
-
+        public string SavePath { get; set; }
         private LogWrite()
         {
         }
@@ -51,6 +51,8 @@ namespace Service.Logger.Services
             string path = doc + "\\" + projectName + "\\LogFile";
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
+
+            SavePath = path;
 
             Log.Logger = new LoggerConfiguration().MinimumLevel.Information().Enrich.WithThreadName().WriteTo.File(
                     path + "\\.log", // 날짜.log 라는 이름으로 파일 생성

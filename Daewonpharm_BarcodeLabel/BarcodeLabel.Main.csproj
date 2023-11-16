@@ -34,9 +34,35 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
+      <HintPath>..\packages\ControlzEx.4.4.0\lib\net462\ControlzEx.dll</HintPath>
+    </Reference>
     <Reference Include="DryIoc, Version=4.7.7.0, Culture=neutral, PublicKeyToken=dfbf2bd50fcf7768, processorArchitecture=MSIL">
       <HintPath>..\packages\DryIoc.dll.4.7.7\lib\net45\DryIoc.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro, Version=2.0.0.0, Culture=neutral, PublicKeyToken=51482d6f650b2b3f, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.2.4.10\lib\net47\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.11.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
@@ -150,8 +176,11 @@
       <HintPath>..\packages\Prism.Wpf.8.1.97\lib\net47\Prism.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -214,6 +243,34 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BarcodeLabel.Core\BarcodeLabel.Core.csproj">
+      <Project>{70C5B44D-0A6C-4679-9545-9F8D0EB18697}</Project>
+      <Name>BarcodeLabel.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CrevisService.LayoutSupport\CrevisService.LayoutSupport.csproj">
+      <Project>{e96c8e27-2c83-473c-ae79-f95cd719d0a0}</Project>
+      <Name>CrevisService.LayoutSupport</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dialog.IOMonitor\Dialog.IOMonitor.csproj">
+      <Project>{31bfa379-4921-4ad6-9084-637ce116a339}</Project>
+      <Name>Dialog.IOMonitor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dialog.LiveCam\Dialog.LiveCam.csproj">
+      <Project>{42bc2da0-e7d8-4f5a-bccb-82ba7850ffc5}</Project>
+      <Name>Dialog.LiveCam</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Camera\Service.Camera.csproj">
+      <Project>{17F19850-AC0F-4D11-ADA7-9809837BE78B}</Project>
+      <Name>Service.Camera</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.IOController\Service.IOController.csproj">
+      <Project>{b84d742d-71a4-447d-8bea-284a8e136924}</Project>
+      <Name>Service.IOController</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.IO\Service.IO.csproj">
+      <Project>{5e8ad4a7-9e1a-4b59-b21d-11c5a84ec26c}</Project>
+      <Name>Service.IO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Service.Logger\Service.Logger.csproj">
       <Project>{E0E1686B-BD6D-4CC3-B44A-E85CF9419CDA}</Project>
       <Name>Service.Logger</Name>
@@ -221,6 +278,10 @@
     <ProjectReference Include="..\Service.Pattern\Service.Pattern.csproj">
       <Project>{7CDA4A51-DE38-4DDD-BF00-53C9EAFA72AD}</Project>
       <Name>Service.Pattern</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Setting\Service.Setting.csproj">
+      <Project>{F2BDFF7C-F3BD-4AA8-9C93-8F118C6EA039}</Project>
+      <Name>Service.Setting</Name>
     </ProjectReference>
     <ProjectReference Include="..\UI.ConnectState\UI.ConnectState.csproj">
       <Project>{1736EA4A-DC6C-4F3D-BC10-FA7B92EDB055}</Project>

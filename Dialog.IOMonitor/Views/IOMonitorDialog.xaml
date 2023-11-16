@@ -1,0 +1,361 @@
+﻿<UserControl x:Class="Dialog.IOMonitor.Views.IOMonitorDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Dialog.IOMonitor.Views"
+             
+             xmlns:con="clr-namespace:Dialog.IOMonitor.Services.ConverterService.ViewConverter"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:viewModels="clr-namespace:Dialog.IOMonitor.ViewModels"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             d:DataContext="{d:DesignInstance Type=viewModels:IOMonitorViewModel, IsDesignTimeCreatable=False}"
+             
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" Background="#333333">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <con:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <con:ControlEnabledToColor x:Key="ControlEnabledToColor"/>
+            <con:ControlEnabledToForgroundConverter x:Key="ControlEnabledToForgroundConverter"/>
+            <con:ControlEnabledToOpacityConverter x:Key="ControlEnabledToOpacityConverter"/>
+            <con:IONameToBorderColorConverter x:Key="IONameToBorderColorConverter"/>
+            <con:MultiCommandParameterConverter x:Key="MultiCommandParameterConverter"/>
+            <con:SignalCheckStateToBackground x:Key="SignalCheckStateToBackground"/>
+            <con:SignalCheckStateToContent x:Key="SignalCheckStateToContent"/>
+            <con:SignalCheckStateToEnabled x:Key="SignalCheckStateToEnabled"/>
+            <con:SignalStateToBorderBrush x:Key="SignalStateToBorderBrush"/>
+            <con:SignalStateToHeightConverter x:Key="SignalStateToHeightConverter"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <prism:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
+            <Setter Property="WindowStyle" Value="SingleBorderWindow"/>
+            <Setter Property="Width" Value="1400"/>
+            <Setter Property="Height" Value="900"/>
+            <Setter Property="Icon" Value="\BarcodeLabel.Core;component\Images\Checkbox_Logo-9.png"/>
+        </Style>
+    </prism:Dialog.WindowStyle>
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+        </b:EventTrigger>
+        <b:EventTrigger EventName="Closing">
+            <b:InvokeCommandAction Command="{Binding ClosingCommand}"/>
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- 기능 버튼 -->
+            <RowDefinition Height="0.13*"/>
+            <RowDefinition Height="0.03*"/>
+            <!-- IO 채널 ListView -->
+            <RowDefinition Height="0.87*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 기능 버튼 -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <!-- Start Stop 버튼 -->
+                <ColumnDefinition Width="0.3*"/>
+                <!-- IO Monitor -->
+                <ColumnDefinition Width="0.2*"/>
+                <!-- 채널 추가 버튼 -->
+                <ColumnDefinition Width="0.4*"/>
+                <!-- 레시피 추가 버튼 -->
+                <ColumnDefinition Width="0.2*"/>
+                <!-- All Delete 버튼 -->
+                <ColumnDefinition Width="0.1*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Start Stop 버튼 -->
+            <Button Grid.Column="0" Margin="10" BorderBrush="DarkGray" BorderThickness="2" FontSize="26" 
+                    VerticalContentAlignment="Center" HorizontalContentAlignment="Center" 
+                    Content="{Binding SignalCheckState, Converter={StaticResource SignalCheckStateToContent}}"
+                    Background="{Binding SignalCheckState, Converter={StaticResource SignalCheckStateToBackground}}" 
+                    Command="{Binding BtnStartStopCommand}">
+            </Button>
+
+            <Button Grid.Column="1" Margin="10" 
+                    FontSize="26" Content="IO Monitor"
+                    Command="{Binding BtnShowIOMonitorCommand}"/>
+
+            <!-- 채널 추가 버튼 -->
+            <Button Grid.Column="2" Margin="10" BorderBrush="DarkGray" BorderThickness="2"
+                    VerticalContentAlignment="Center" HorizontalContentAlignment="Center" 
+                    IsEnabled="{Binding SignalCheckState, Converter={StaticResource SignalCheckStateToEnabled}}"
+                    Command="{Binding BtnAddChannelCommand}">
+                <iconPacks:PackIconMaterial Kind="PlaylistPlus" Width="50" Height="50" />
+            </Button>
+
+            <!-- 레시피 관련 -->
+            <Grid Grid.Column="3" Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.7*"/>
+                    <ColumnDefinition Width="0.3*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- 레시피 ComboBox -->
+                <ComboBox 
+                    Grid.Row="0" Grid.ColumnSpan="2" Margin="2"
+                    x:Name="RecipeComboBox"
+                    HorizontalContentAlignment="Stretch"
+                    IsEnabled="{Binding SignalCheckState, Converter={StaticResource SignalCheckStateToEnabled}}"
+                    ItemsSource="{Binding RecipeCollection}"
+                    SelectedItem="{Binding SelectedRecipe}">
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="DropDownClosed">
+                            <b:InvokeCommandAction Command="{Binding CdoDropDownClosedCommand}" 
+                                                   CommandParameter="{Binding ElementName=RecipeComboBox, Path=SelectedItem}"/>
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.8*"/>
+                                    <ColumnDefinition Width="0.2*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" x:Name="RecipeName" FontSize="16" 
+                                           VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                           Text="{Binding}" />
+                                <Button Grid.Column="1"
+                                        Foreground="#F44848" 
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding Path=DataContext.BtnDeleteRecipeCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                        CommandParameter="{Binding ElementName=RecipeName, Path=Text}">
+
+                                    <iconPacks:PackIconModern Kind="ListDelete" />
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
+
+                <!-- 레시피명 입력란 -->
+                <TextBox 
+                    x:Name="RecipeName"
+                    Grid.Row="1" Grid.Column="0" Margin="2"
+                    VerticalContentAlignment="Center" FontSize="14"
+                    IsEnabled="{Binding SignalCheckState, Converter={StaticResource SignalCheckStateToEnabled}}"
+                    Text="{Binding InputRecipeName}"/>
+
+                <!-- 툴팁 같은거 -->
+                <TextBlock
+                    Grid.Row="1" Grid.Column="0" Margin="10"
+                    Text="Recipe Name.." 
+                    IsHitTestVisible="False" 
+                    VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Hidden"/>
+                            <Setter Property="Foreground" Value="Gray"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=RecipeName}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- 레시피 저장 버튼 -->
+                <Button 
+                    Grid.Row="1" Grid.Column="1"
+                    BorderBrush="DarkGray" BorderThickness="2"
+                    FontSize="14" Content="Save" 
+                    IsEnabled="{Binding SignalCheckState, Converter={StaticResource SignalCheckStateToEnabled}}"
+                    Command="{Binding BtnRecipeSaveClickCommand}" 
+                    CommandParameter="{Binding ElementName=RecipeName, Path=Text}"/>
+            </Grid>
+
+            <!-- All Delete 버튼 -->
+            <Button x:Name="AllDelete" Grid.Column="4" Margin="10" 
+                    BorderBrush="DarkGray" BorderThickness="2" 
+                    VerticalContentAlignment="Center" Foreground="#F44848"
+                    IsEnabled="{Binding SignalCheckState, Converter={StaticResource SignalCheckStateToEnabled}}"
+                    Command="{Binding BtnAllDeleteCommand}" 
+                    MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave">
+                <StackPanel>
+                    <iconPacks:PackIconMaterial x:Name="AllDeleteIcon" Margin="3" Kind="Delete" Width="30" Height="30" HorizontalAlignment="Center"/>
+                    <TextBlock Text="All Delete"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <TextBlock Grid.Row="1" Margin="10,0,0,0" Foreground="LightGray" Text="{Binding TackTime}"/>
+
+        <!-- IO 채널 ListView -->
+        <ScrollViewer Grid.Row="2" Margin="5">
+            <ListView x:Name="ChannelCollection" Grid.Row="1" Margin="5" 
+                      Background="#333333" 
+                      HorizontalAlignment="Stretch" 
+                      ItemsSource="{Binding ChannelCollection}">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,0,0,20" 
+                                BorderBrush="DarkGray" BorderThickness="2" 
+                                Background="#333333">
+                            <Grid Margin="5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="0.5*"/>
+                                    <RowDefinition Height="0.5*"/>
+                                </Grid.RowDefinitions>
+                                <!-- 채널 정보 -->
+                                <StackPanel Grid.Row="0" Orientation="Horizontal">
+
+                                    <!-- 슬롯 이름 -->
+                                    <StackPanel  Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <Border BorderThickness="2" 
+                                                BorderBrush="{Binding ElementName=IOName, Path=Text, Converter={StaticResource IONameToBorderColorConverter}}" />
+                                        <TextBlock x:Name="IOName" FontSize="20" Foreground="LightGray" Text="{Binding SelectedChannel.IO.Name}"/>
+                                        <Border BorderThickness="1" 
+                                                BorderBrush="{Binding ElementName=IOName, Path=Text, Converter={StaticResource IONameToBorderColorConverter}}" />
+                                    </StackPanel>
+
+                                    <!-- 채널 인덱스 -->
+                                    <TextBlock Margin="10,0,0,0" FontSize="20" Foreground="LightGray" VerticalAlignment="Center" Text="{Binding SelectedChannel.Channel.MyIndex}"/>
+                                    <TextBlock Margin="5,0,0,0" FontSize="20" Foreground="LightGray" VerticalAlignment="Center" Text="Channel"/>
+
+                                    <!-- 제거 버튼 -->
+                                    <Button Margin="5,0,0,0" VerticalContentAlignment="Center" Background="Transparent" Foreground="#F44848"
+                                            IsEnabled="{Binding ElementName=AllDelete, Path=IsEnabled}"
+                                            Command="{Binding ElementName=ChannelCollection, Path=DataContext.BtnDeleteChannelCollection}">
+                                        <Button.CommandParameter>
+                                            <MultiBinding Converter="{StaticResource MultiCommandParameterConverter}">
+                                                <Binding ElementName="ChannelCollection" Path="ItemsSource"/>
+                                                <Binding/>
+                                            </MultiBinding>
+                                        </Button.CommandParameter>
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Flat}">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid>
+                                                                <ContentPresenter x:Name="ContentPresenter" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                <iconPacks:PackIconMaterial x:Name="Icon" 
+                                                                Kind="Delete" 
+                                                                Width="24" 
+                                                                Height="24" 
+                                                                HorizontalAlignment="Center" 
+                                                                VerticalAlignment="Center"/>
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="Icon" Property="Kind" Value="DeleteEmpty" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </StackPanel>
+
+                                <!-- 그래프 ListView -->
+                                <ListView x:Name="GraphListView" Grid.Row="1" Margin="0,10" Background="#333333"
+                                          ItemsSource="{Binding SignalRecordCollection}" >
+                                    <b:Interaction.Triggers>
+                                        <b:EventTrigger EventName="MouseLeftButtonUp">
+                                            <b:InvokeCommandAction Command="{Binding ElementName=ChannelCollection, Path=DataContext.ItemClickCommand}"
+                                                                   CommandParameter="{Binding ElementName=GraphListView, Path=SelectedIndex}" />
+                                        </b:EventTrigger>
+                                    </b:Interaction.Triggers>
+                                    <ListView.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ListView.ItemsPanel>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="0.7*"/>
+                                                    <RowDefinition Height="0.3*"/>
+                                                </Grid.RowDefinitions>
+
+                                                <Grid Panel.ZIndex="1">
+                                                    <Grid.Style>
+                                                        <Style TargetType="Grid">
+                                                            <Setter Property="Opacity" Value="0.3"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Selected}" Value="true">
+                                                                    <Setter Property="Grid.Background" Value="#9966FF"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Selected}" Value="false">
+                                                                    <Setter Property="Grid.Background" Value="Transparent"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Grid.Style>
+                                                </Grid>
+
+                                                <!-- 신호 -->
+                                                <Grid Grid.Row="0" Panel.ZIndex="0" Width="30" Height="30" Background="#333333">
+                                                    <Border Padding="0"  BorderThickness="2" Width="30" VerticalAlignment="Bottom" 
+                                                            BorderBrush="{Binding ElementName=IOName, Path=Text, Converter={StaticResource IONameToBorderColorConverter}}"  
+                                                            Background="{Binding ElementName=IOName, Path=Text, Converter={StaticResource IONameToBorderColorConverter}}" 
+                                                            Height="{Binding Signal, Converter={StaticResource SignalStateToHeightConverter}}"/>
+                                                </Grid>
+
+                                                <!-- 신호 변동 구간 -->
+                                                <Grid Grid.Row="0" Width="30" Height="50">
+                                                    <Border Background="Transparent" Height="50" VerticalAlignment="Center" BorderThickness="1,0,0,0">
+                                                        <Border.BorderBrush>
+                                                            <MultiBinding Converter="{StaticResource SignalStateToBorderBrush}">
+                                                                <Binding RelativeSource="{RelativeSource Mode=PreviousData}"/>
+                                                                <Binding Path="Signal"/>
+                                                            </MultiBinding>
+                                                        </Border.BorderBrush>
+                                                    </Border>
+                                                </Grid>
+
+                                                <!-- 신호 변동 시간 -->
+                                                <Grid Grid.Row="1" Background="#333333">
+                                                    <TextBlock Foreground="LightGray" FontSize="10" Text="{Binding SignalTime}"/>
+                                                </Grid>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                </ListView>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

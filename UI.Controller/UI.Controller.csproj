@@ -31,6 +31,24 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.31\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
@@ -59,6 +77,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControllerModule.cs" />
+    <Compile Include="Models\EInspectionState.cs" />
+    <Compile Include="Services\ConverterService\ViewConverters\InspectionStateToColor.cs" />
+    <Compile Include="Services\ConverterService\ViewConverters\InspectionStateToContent.cs" />
     <Compile Include="ViewModels\ControllerViewModel.cs" />
     <Compile Include="Views\ControllerUserControl.xaml.cs">
       <DependentUpon>ControllerUserControl.xaml</DependentUpon>
@@ -92,5 +113,16 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BarcodeLabel.Core\BarcodeLabel.Core.csproj">
+      <Project>{70C5B44D-0A6C-4679-9545-9F8D0EB18697}</Project>
+      <Name>BarcodeLabel.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Camera\Service.Camera.csproj">
+      <Project>{17F19850-AC0F-4D11-ADA7-9809837BE78B}</Project>
+      <Name>Service.Camera</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

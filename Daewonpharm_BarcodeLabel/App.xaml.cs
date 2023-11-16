@@ -17,9 +17,10 @@ namespace BarcodeLabel.Main
     public partial class App : Application
     {
         private Mutex _mutex = null;
-
+        private LogWrite _logWrite = LogWrite.Instance;
         protected override void OnStartup(StartupEventArgs e)
         {
+            _logWrite.DefaultSet();
 
             Thread.CurrentThread.Name = "MainThread";
             // 중복실행방지
@@ -39,16 +40,19 @@ namespace BarcodeLabel.Main
                 else
                 {
                     MessageBox.Show("Application already started.", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    _logWrite?.Info("Application already started");
                     Current.Shutdown();
                 }
             }
-            catch (Exception err)
+            catch (Exception)
             {
-                MessageBox.Show("Application Load Error.\r\n" + err.Message);
+                //MessageBox.Show("Application Load Error.\r\n" + err.Message);
+                _logWrite?.Error("Application Load Error.", true, false);
                 Current.Shutdown();
             }
 
             // Prism BootStrapper 시작
+            _logWrite?.Info("Bootstrapper Start!", false, false);
             Bootstrapper bootstrapper = new Bootstrapper();
             bootstrapper.Run();
         }

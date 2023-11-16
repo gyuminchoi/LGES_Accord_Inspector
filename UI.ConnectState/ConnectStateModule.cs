@@ -1,4 +1,8 @@
-﻿using Prism.Ioc;
+﻿using Dialog.CameraState.ViewModels;
+using Dialog.CameraState.Views;
+using Dialog.IOMonitor.ViewModels;
+using Dialog.IOMonitor.Views;
+using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
 using System;
@@ -28,6 +32,10 @@ namespace UI.ConnectState
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterForNavigation<ConnectStateUserControl, ConnectStateViewModel>();
+
+
+            containerRegistry.RegisterDialog<CameraStateDialog, CameraStateViewModel>();
+            containerRegistry.RegisterDialog<IOMonitorDialog, IOMonitorViewModel>();
         }
     }
 }
