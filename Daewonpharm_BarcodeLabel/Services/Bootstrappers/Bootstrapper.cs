@@ -7,16 +7,18 @@ using Prism.Modularity;
 using Prism.Mvvm;
 using Service.Camera.Models;
 using Service.Camera.Services;
+using Service.ConnectionCheck.Services;
+using Service.Database.Models;
+using Service.Database.Services;
 using Service.IO.Services;
 using Service.Logger.Services;
+using Service.Postprocessing.Services;
 using Service.Setting.Services;
+using Service.VisionPro.Services;
+using Services.ImageMerge.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using UI.ConnectState;
 using UI.Controller;
@@ -32,13 +34,19 @@ namespace BarcodeLabel.Main.Services.Bootstrappers
         private readonly string[] _possibleViews = new[] { "Window", "Dialog", "View", "UserControl" };
         private LogWrite _logWrite = LogWrite.Instance;
         private IOManager _ioManager = IOManager.Instance;
+        
 
         protected override DependencyObject CreateShell() => Container.Resolve<MainWindow>();
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterSingleton<ICameraManager, CameraManager>();
             containerRegistry.RegisterSingleton<ISettingManager, SettingManager>();
+            containerRegistry.RegisterSingleton<ICameraManager, CameraManager>();
+            containerRegistry.RegisterSingleton<IImageMergeManager, ImageMergeManager>();
+            containerRegistry.RegisterSingleton<IVisionProManager, VisionProManager>();
+            containerRegistry.RegisterSingleton<IPostprocessingManager, PostprocessingManager>();
+            containerRegistry.RegisterSingleton<IConnectionCheckManager, ConnectionCheckManager>();
+            containerRegistry.RegisterSingleton<ISQLiteManager,SQLiteManager>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
@@ -55,31 +63,49 @@ namespace BarcodeLabel.Main.Services.Bootstrappers
 
         protected override void InitializeModules()
         {
-            _logWrite.Info("SplashScreen Start!");
+            _logWrite.Info("Splash screen start!");
             SplashScreen sc = new SplashScreen(@"/Resources/Images/checkbox_logo.png");
             sc.Show(false);
 
             base.InitializeModules();
 
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
 
             ISettingManager settingManager = Container.Resolve<ISettingManager>();
             settingManager.Initialize();
-            settingManager.Deserialize();
+            settingManager.Load();
             _logWrite.Info("Initialize Setting Manager Complete!");
 
             ICameraManager camManager = Container.Resolve<ICameraManager>();
             camManager.Opens();
             _logWrite.Info("Initialize Camera Manager Complete!");
 
-            //bool isOpen = _ioManager.Open(settingManager.AppSetting.IOSetting.IPAddress);
-            //if (isOpen)
-            //{
-            //    _ioManager.Start(true);
-            //    //TODO : IO Test
-            //    //_ioManager.WriteThread();
-            //    _logWrite?.Info("Initialize IO Manager Complete!");
-            //}
+            bool isOpen = _ioManager.Open(settingManager.AppSetting.IOSetting.IPAddress);
+            if (isOpen)
+            {
+                _ioManager.Start(true);
+                _logWrite?.Info("Initialize IO Manager Complete!");
+            }
+
+            IImageMergeManager imManager = Container.Resolve<IImageMergeManager>();
+            imManager.Initialize(camManager);
+            _logWrite.Info("Initialize Preprocessing Manager Complete!");
+
+            IVisionProManager vpManager = Container.Resolve<IVisionProManager>();
+            vpManager.Initialize(imManager);
+            _logWrite.Info("Initialize VisionPro Manager Complete!");
+
+            IPostprocessingManager postprocessingManager = Container.Resolve<IPostprocessingManager>();
+            postprocessingManager.Initialize(vpManager);
+            _logWrite.Info("Initialize Postprocessing Manager Complete!");
+
+            ISQLiteManager sqliteManager = Container.Resolve<ISQLiteManager>();
+            sqliteManager.Initialize(settingManager);
+            _logWrite.Info("Initialize SQLite Manager Complete!");
+
+            IConnectionCheckManager ccManager = Container.Resolve<IConnectionCheckManager>();
+            ccManager.Initialize(camManager, vpManager, sqliteManager);
+            _logWrite.Info("Initialize Connection Check Manager Complete!");
 
             IEventAggregator eventAggregator = Container.Resolve<IEventAggregator>();
             eventAggregator.GetEvent<ServicesInitCompleteEvent>().Publish();

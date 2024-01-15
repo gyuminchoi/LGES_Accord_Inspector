@@ -62,6 +62,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -121,6 +122,26 @@
     <ProjectReference Include="..\Service.Camera\Service.Camera.csproj">
       <Project>{17F19850-AC0F-4D11-ADA7-9809837BE78B}</Project>
       <Name>Service.Camera</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.ImageMerge\Service.ImageMerge.csproj">
+      <Project>{72B5B909-5D50-4AEB-9EB5-AFE6720837C0}</Project>
+      <Name>Service.ImageMerge</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Postprocessing\Service.Postprocessing.csproj">
+      <Project>{E02AED11-1AB5-4BC8-8E81-8D0923AA81AF}</Project>
+      <Name>Service.Postprocessing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Preprocessing\Service.Preprocessing.csproj">
+      <Project>{62D83649-AAC9-439C-8F78-6703782E8E65}</Project>
+      <Name>Service.Preprocessing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Setting\Service.Setting.csproj">
+      <Project>{F2BDFF7C-F3BD-4AA8-9C93-8F118C6EA039}</Project>
+      <Name>Service.Setting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.VisionPro\Service.VisionPro.csproj">
+      <Project>{6e66ebdc-e859-4f69-b72b-b445e41be3f7}</Project>
+      <Name>Service.VisionPro</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

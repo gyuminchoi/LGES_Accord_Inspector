@@ -13,7 +13,7 @@
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         
         mc:Ignorable="d"
-        Title="MainWindow" Height="1080" Width="1920" ResizeMode="NoResize" TitleBarHeight="0"  Background="#333333" WindowState="{Binding WindowState}" >
+        Title="MainWindow" Height="1080" Width="1920" ResizeMode="NoResize" TitleBarHeight="0" Background="#333333" WindowState="{Binding WindowState}">
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">
             <prism:InvokeCommandAction Command="{Binding LoadedCommand}"/>
@@ -25,13 +25,13 @@
     <Grid>
         <Grid.RowDefinitions>
             <!-- Title -->
-            <RowDefinition Height="0.08*" />
+            <RowDefinition Height="0.07*" />
             <!-- View -->
-            <RowDefinition Height="0.85*" />
+            <RowDefinition Height="0.86*" />
             <!-- Tack -->
             <RowDefinition Height="0.07*" />
         </Grid.RowDefinitions>
-        <Grid>
+        <Grid Grid.Row="0" Background="#666666">
             <Grid.ColumnDefinitions>
                 <!-- Logo -->
                 <ColumnDefinition Width="0.3*"/>
@@ -43,7 +43,7 @@
                 <ColumnDefinition Width="0.2*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.ColumnSpan="4" Background="#333333" BorderBrush="#9966FF" BorderThickness="0,0,0,2"/>
+            <!--<Border Grid.ColumnSpan="4" Background="#333333" BorderBrush="#9966FF" BorderThickness="0,0,0,2"/>-->
             
             <!-- Logo -->
             <Image Grid.Column="0" Margin="5" HorizontalAlignment="Left"
@@ -53,7 +53,7 @@
             <TextBlock Grid.Column="1"
                        VerticalAlignment="Center" HorizontalAlignment="Center"
                        Foreground="LightGray" FontSize="48" FontWeight="Bold"
-                       Text="꼭 발주 받자!"/>
+                       Text="Project Name"/>
             
             <!-- Time & Version -->
             <StackPanel Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -69,23 +69,20 @@
             <!-- Close, Minimize Btn -->
             <StackPanel Grid.Column="3" 
                         Orientation="Horizontal"
-                        HorizontalAlignment="Right">
-                
-                <Button Margin="3" Width="80" Command="{Binding BtnMinimizeCommand}">
-                    <iconPacks:PackIconMaterial Kind="WindowMinimize"
-                                                Width="50" Height="50"
-                                                Foreground="Black"/>
+                        HorizontalAlignment="Left" Height="74" Margin="232,0,0,0" VerticalAlignment="Top">
+                <!-- Minimize Btn -->
+                <Button Margin="3" Width="70" Background="#333333" BorderBrush="LightGray" BorderThickness="2" Foreground="LightGray"
+                        Command="{Binding BtnMinimizeCommand}">
+                    <iconPacks:PackIconMaterial Kind="WindowMinimize" Width="40" Height="40"/>
                 </Button>
                 <!-- Close Btn -->
-                <Button Margin="3" Width="80">
+                <Button Margin="3" Width="70" Background="#333333" BorderBrush="LightGray" BorderThickness="2" Foreground="LightGray">
                     <b:Interaction.Triggers>
                         <b:EventTrigger EventName="Click">
                             <b:CallMethodAction MethodName="Close" TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
                         </b:EventTrigger>
                     </b:Interaction.Triggers>
-                    <iconPacks:PackIconEvaIcons Kind="Close"
-                                                Width="50" Height="50" 
-                                                Foreground="Black"/>
+                    <iconPacks:PackIconEvaIcons Kind="Close" Width="40" Height="40" />
                 </Button>
             </StackPanel>
         </Grid>
@@ -100,7 +97,6 @@
                     <ColumnDefinition Width="0.75*"/>
                     <ColumnDefinition Width="0.25*"/>
                 </Grid.ColumnDefinitions>
-
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <!-- Menu -->
                     <ContentControl prism:RegionManager.RegionName="MenuBarRegion"/>

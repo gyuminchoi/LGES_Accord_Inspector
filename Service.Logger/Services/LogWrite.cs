@@ -87,6 +87,7 @@ namespace Service.Logger.Services
         {
             Log.Information(msg);
 
+            
             if (LogBoardUpdateEvent != null && isUILogBoardWrite)
             {
                 LogBoardUpdateEvent("[INFO] - " + msg);

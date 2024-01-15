@@ -128,6 +128,14 @@
       <Project>{7CDA4A51-DE38-4DDD-BF00-53C9EAFA72AD}</Project>
       <Name>Service.Pattern</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Service.Postprocessing\Service.Postprocessing.csproj">
+      <Project>{E02AED11-1AB5-4BC8-8E81-8D0923AA81AF}</Project>
+      <Name>Service.Postprocessing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.VisionPro\Service.VisionPro.csproj">
+      <Project>{6E66EBDC-E859-4F69-B72B-B445E41BE3F7}</Project>
+      <Name>Service.VisionPro</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -18,7 +18,7 @@ namespace Service.Camera.Services.ConvertService
 {
     public class BitmapConverter : LazySingleton<BitmapConverter>
     {
-        public Bitmap RawDataToBitmap(CameraConfig camConfig, IntPtr pImage)
+        public Bitmap IntPtrToBitmap(CameraConfig camConfig, IntPtr pImage)
         {
             Bitmap bmp;
 
@@ -28,6 +28,18 @@ namespace Service.Camera.Services.ConvertService
 
             return bmp;
         }
+
+        public Bitmap IntPtrToBitmap(BitmapData bmpData, IntPtr pImage)
+        {
+            Bitmap bmp;
+
+            bmp = new Bitmap(bmpData.Width, bmpData.Height, bmpData.Stride, bmpData.PixelFormat, pImage);
+
+            SetGrayScale(ref bmp);
+
+            return bmp;
+        }
+
 
         public Bitmap ByteArrayToBitmap(BitmapData originalData, byte[] source, PixelFormat format)
         {
@@ -46,6 +58,19 @@ namespace Service.Camera.Services.ConvertService
             BitmapData resultData = bmp.LockBits(new Rectangle(0, 0, originalData.Width, originalData.Height), ImageLockMode.ReadOnly, format);
             Marshal.Copy(source, 0, resultData.Scan0, resultData.Stride * resultData.Height);
             bmp.UnlockBits(resultData);
+
+            return bmp;
+        }
+
+        public Bitmap ByteArrToBitmap(byte[] data, int width, int height, PixelFormat pixelFormat)
+        {
+            Bitmap bmp = new Bitmap(width, height, pixelFormat);
+
+            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, bmp.PixelFormat);
+
+            Marshal.Copy(data, 0, bmpData.Scan0, data.Length);
+
+            bmp.UnlockBits(bmpData);
 
             return bmp;
         }
@@ -77,19 +102,6 @@ namespace Service.Camera.Services.ConvertService
 
                 return new Bitmap(bitmap);
             }
-        }
-
-        public Bitmap ByteArrToBitmap(byte[] data, int width, int height, PixelFormat pixelFormat)
-        {
-            Bitmap bmp = new Bitmap(width, height, pixelFormat);
-
-            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, bmp.PixelFormat);
-
-            Marshal.Copy(data, 0, bmpData.Scan0, data.Length);
-
-            bmp.UnlockBits(bmpData);
-
-            return bmp;
         }
 
         public Bitmap ConvertTo24bpp(Bitmap originalBitmap)

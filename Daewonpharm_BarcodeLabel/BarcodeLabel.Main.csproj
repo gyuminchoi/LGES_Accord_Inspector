@@ -15,25 +15,6 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
@@ -193,6 +174,21 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Xceed.Wpf.AvalonDock, Version=4.5.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.5.1\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=4.5.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.5.1\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=4.5.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.5.1\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=4.5.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.5.1\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=4.5.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.5.1\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -251,6 +247,26 @@
       <Project>{e96c8e27-2c83-473c-ae79-f95cd719d0a0}</Project>
       <Name>CrevisService.LayoutSupport</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dialog.AppSetting\Dialog.AppSetting.csproj">
+      <Project>{a4acc0d0-dac5-4192-afcd-7755e8c52871}</Project>
+      <Name>Dialog.AppSetting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dialog.CameraState\Dialog.CameraState.csproj">
+      <Project>{38be2ac8-4345-4038-a69e-6a673c828b2a}</Project>
+      <Name>Dialog.CameraState</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dialog.DatabaseState\Dialog.DatabaseState.csproj">
+      <Project>{cc5054c3-50cd-402d-a2fb-6be64e8e9f50}</Project>
+      <Name>Dialog.DatabaseState</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dialog.DirectorySelecton\Dialog.DirectorySelecton.csproj">
+      <Project>{75befaf2-189a-4b47-82bf-7f6a9b366316}</Project>
+      <Name>Dialog.DirectorySelecton</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dialog.History\Dialog.History.csproj">
+      <Project>{46ec0b51-bd02-42c8-8dd0-6ba9e34b40b7}</Project>
+      <Name>Dialog.History</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dialog.IOMonitor\Dialog.IOMonitor.csproj">
       <Project>{31bfa379-4921-4ad6-9084-637ce116a339}</Project>
       <Name>Dialog.IOMonitor</Name>
@@ -262,6 +278,30 @@
     <ProjectReference Include="..\Service.Camera\Service.Camera.csproj">
       <Project>{17F19850-AC0F-4D11-ADA7-9809837BE78B}</Project>
       <Name>Service.Camera</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.ConnectionCheck\Service.ConnectionCheck.csproj">
+      <Project>{CCD5AA9F-2E32-49CB-9247-F8CE50078258}</Project>
+      <Name>Service.ConnectionCheck</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.CustomException\Service.CustomException.csproj">
+      <Project>{0c853bac-42cd-43af-9ef3-2e34a1d2a33f}</Project>
+      <Name>Service.CustomException</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Database\Service.Database.csproj">
+      <Project>{CE51A3AD-9CE7-4F82-9A32-59575BC61038}</Project>
+      <Name>Service.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Drawing\Service.Drawing.csproj">
+      <Project>{320d746d-2e95-4b08-a758-fdddaec98198}</Project>
+      <Name>Service.Drawing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.ImageMerge\Service.ImageMerge.csproj">
+      <Project>{72b5b909-5d50-4aeb-9eb5-afe6720837c0}</Project>
+      <Name>Service.ImageMerge</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Inspection\Service.Inspection.csproj">
+      <Project>{ceec9cb0-a420-4fec-8669-37cb34541c0f}</Project>
+      <Name>Service.Inspection</Name>
     </ProjectReference>
     <ProjectReference Include="..\Service.IOController\Service.IOController.csproj">
       <Project>{b84d742d-71a4-447d-8bea-284a8e136924}</Project>
@@ -279,9 +319,25 @@
       <Project>{7CDA4A51-DE38-4DDD-BF00-53C9EAFA72AD}</Project>
       <Name>Service.Pattern</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Service.Postprocessing\Service.Postprocessing.csproj">
+      <Project>{E02AED11-1AB5-4BC8-8E81-8D0923AA81AF}</Project>
+      <Name>Service.Postprocessing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Preprocessing\Service.Preprocessing.csproj">
+      <Project>{62D83649-AAC9-439C-8F78-6703782E8E65}</Project>
+      <Name>Service.Preprocessing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Save\Service.Save.csproj">
+      <Project>{ee54966b-7c33-4566-a65c-299a3c207b7b}</Project>
+      <Name>Service.Save</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Service.Setting\Service.Setting.csproj">
       <Project>{F2BDFF7C-F3BD-4AA8-9C93-8F118C6EA039}</Project>
       <Name>Service.Setting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.VisionPro\Service.VisionPro.csproj">
+      <Project>{6E66EBDC-E859-4F69-B72B-B445E41BE3F7}</Project>
+      <Name>Service.VisionPro</Name>
     </ProjectReference>
     <ProjectReference Include="..\UI.ConnectState\UI.ConnectState.csproj">
       <Project>{1736EA4A-DC6C-4F3D-BC10-FA7B92EDB055}</Project>

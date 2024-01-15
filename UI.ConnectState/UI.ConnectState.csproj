@@ -114,6 +114,10 @@
       <Project>{38BE2AC8-4345-4038-A69E-6A673C828B2A}</Project>
       <Name>Dialog.CameraState</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dialog.DatabaseState\Dialog.DatabaseState.csproj">
+      <Project>{CC5054C3-50CD-402D-A2FB-6BE64E8E9F50}</Project>
+      <Name>Dialog.DatabaseState</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dialog.IOMonitor\Dialog.IOMonitor.csproj">
       <Project>{31bfa379-4921-4ad6-9084-637ce116a339}</Project>
       <Name>Dialog.IOMonitor</Name>
@@ -121,6 +125,14 @@
     <ProjectReference Include="..\Service.Camera\Service.Camera.csproj">
       <Project>{17F19850-AC0F-4D11-ADA7-9809837BE78B}</Project>
       <Name>Service.Camera</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.ConnectionCheck\Service.ConnectionCheck.csproj">
+      <Project>{CCD5AA9F-2E32-49CB-9247-F8CE50078258}</Project>
+      <Name>Service.ConnectionCheck</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Database\Service.Database.csproj">
+      <Project>{CE51A3AD-9CE7-4F82-9A32-59575BC61038}</Project>
+      <Name>Service.Database</Name>
     </ProjectReference>
     <ProjectReference Include="..\Service.IO\Service.IO.csproj">
       <Project>{5E8AD4A7-9E1A-4B59-B21D-11C5A84EC26C}</Project>

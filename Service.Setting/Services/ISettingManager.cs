@@ -17,12 +17,12 @@ namespace Service.Setting.Services
         /// <summary>
         /// Json파일을 읽어 값을 받아옵니다.
         /// </summary>
-        void Deserialize();
+        void Load();
 
         /// <summary>
         /// Json파일에 값을 저장합니다.
         /// </summary>
-        void Serialize();
+        void Save();
 
         AppSetting AppSetting { get; set; }
     }

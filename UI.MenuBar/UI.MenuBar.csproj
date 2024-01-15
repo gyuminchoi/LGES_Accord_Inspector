@@ -228,9 +228,17 @@
       <Project>{75BEFAF2-189A-4B47-82BF-7F6A9B366316}</Project>
       <Name>Dialog.DirectorySelecton</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dialog.History\Dialog.History.csproj">
+      <Project>{46EC0B51-BD02-42C8-8DD0-6BA9E34B40B7}</Project>
+      <Name>Dialog.History</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dialog.LiveCam\Dialog.LiveCam.csproj">
       <Project>{42BC2DA0-E7D8-4F5A-BCCB-82BA7850FFC5}</Project>
       <Name>Dialog.LiveCam</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.Database\Service.Database.csproj">
+      <Project>{CE51A3AD-9CE7-4F82-9A32-59575BC61038}</Project>
+      <Name>Service.Database</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -46,7 +46,7 @@ namespace BarcodeLabel.Main
             }
             catch (Exception)
             {
-                //MessageBox.Show("Application Load Error.\r\n" + err.Message);
+                //MessageBox.Show("Application RecipeLoad Error.\r\n" + err.Message);
                 _logWrite?.Error("Application Load Error.", true, false);
                 Current.Shutdown();
             }

@@ -4,13 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Dialog.AppSetting.Views"
-             
+             xmlns:enum="clr-namespace:Dialog.AppSetting.Models"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:wpfx="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:viewModels="clr-namespace:Dialog.AppSetting.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance Type=viewModels:AppSettingViewModel, IsDesignTimeCreatable=False}"
-             
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800" Background="#333333">
     <prism:Dialog.WindowStyle>
@@ -23,6 +23,14 @@
             <Setter Property="Icon" Value="\BarcodeLabel.Core;component\Images\Checkbox_Logo-9.png"/>
         </Style>
     </prism:Dialog.WindowStyle>
+    <UserControl.Resources>
+        <Style TargetType="GroupBox">
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Foreground" Value="LightGray"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <TabControl Margin="10" Background="#333333">
             <TabControl.Style>
@@ -32,14 +40,6 @@
                 <!-- 이미지 저장 여부 -->
                 <StackPanel Orientation="Vertical" VerticalAlignment="Top">
                     <GroupBox Margin="5" Header="Save Whether">
-                        <GroupBox.Style>
-                            <Style TargetType="GroupBox">
-                                <Setter Property="BorderBrush" Value="Black"/>
-                                <Setter Property="BorderThickness" Value="2"/>
-                                <Setter Property="Foreground" Value="LightGray"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
-                            </Style>
-                        </GroupBox.Style>
                         <StackPanel Orientation="Horizontal">
                             <StackPanel Margin="5" Orientation="Horizontal">
                                 <TextBlock Margin="5" VerticalAlignment="Center" Text="Overlay Image"/>
@@ -56,15 +56,7 @@
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Margin="5" Header="Save Path">
-                        <GroupBox.Style>
-                            <Style TargetType="GroupBox">
-                                <Setter Property="BorderBrush" Value="Black"/>
-                                <Setter Property="BorderThickness" Value="2"/>
-                                <Setter Property="Foreground" Value="LightGray"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
-                            </Style>
-                        </GroupBox.Style>
+                    <GroupBox Margin="5" Header="Inspection Image Save Path">
                         <Grid Margin="5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="0.8*"/>
@@ -72,44 +64,226 @@
                             </Grid.ColumnDefinitions>
                             <TextBox Grid.Column="0" 
                                      IsReadOnly="True"
-                                     Text="{Binding SettingManager.AppSetting.ImageSetting.SavePath}"/>
+                                     Text="{Binding SettingManager.AppSetting.ImageSetting.InspectionImageSavePath}"/>
                             <Button Grid.Column="1" 
                                     HorizontalAlignment="Center" Width="70" Content="..."
-                                    Command="{Binding BtnSelectImageSavePathCommand}"/>
+                                    Command="{Binding BtnSelectImageSavePathCommand}"
+                                    CommandParameter="{x:Static enum:PathType.InspectionImageSavePath}"/>
                         </Grid>
                     </GroupBox>
-                    
+
+                    <GroupBox Margin="5" Header="Live Image Save Path">
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.8*"/>
+                                <ColumnDefinition Width="0.2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" 
+                                     IsReadOnly="True"
+                                     Text="{Binding SettingManager.AppSetting.ImageSetting.LiveImageSavePath}"/>
+                            <Button Grid.Column="1" 
+                                    HorizontalAlignment="Center" Width="70" Content="..."
+                                    Command="{Binding BtnSelectImageSavePathCommand}"
+                                    CommandParameter="{x:Static enum:PathType.LiveImageSavePath}"/>
+                        </Grid>
+                    </GroupBox>
                 </StackPanel>
             </TabItem>
 
             <TabItem Header="IO Setting" Background="#333333" Foreground="LightGray">
                 <StackPanel>
                     <GroupBox Margin="5" Header="IP Address">
-                        <GroupBox.Style>
-                            <Style TargetType="GroupBox">
-                                <Setter Property="BorderBrush" Value="Black"/>
-                                <Setter Property="BorderThickness" Value="2"/>
-                                <Setter Property="Foreground" Value="LightGray"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
-                            </Style>
-                        </GroupBox.Style>
                         <Grid Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="0.5*"/>
-                                <ColumnDefinition Width="0.5*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" HorizontalAlignment="Left" Width="300" />
+                            <TextBox Grid.Column="0" 
+                                     Text="{Binding SettingManager.AppSetting.IOSetting.IPAddress}"/>
                         </Grid>
                     </GroupBox>
                 </StackPanel>
             </TabItem>
 
-            <TabItem Header="Vision Pro Setting" Background="#333333" Foreground="LightGray">
+            <TabItem Header="Vision Pro Setting" 
+                     Background="#333333" Foreground="LightGray">
+                <StackPanel Orientation="Vertical">
+                    <Grid>
+                        <ComboBox  x:Name="RecipeComboBox" Margin="5" DisplayMemberPath="Key" SelectedValuePath="Value" 
+                               Height="35" FontSize="16" 
+                               HorizontalContentAlignment="Center"
+                               ItemsSource="{Binding VisionProRecipe}" 
+                               SelectedValue="{Binding SelectedRecipe}">
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="SelectionChanged">
+                                    <b:InvokeCommandAction Command="{Binding RecipeChanagedCommand}" CommandParameter="{Binding SelectedRecipe}"/>
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
+                        </ComboBox>
+                        <TextBlock Margin="10,0"
+                               Text="Selection Recipe.."
+                               IsHitTestVisible="False" 
+                               VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                    <Setter Property="Foreground" Value="Gray"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=RecipeComboBox}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                    
 
+                    <GroupBox Margin="5" Header="PatMax Tool Path">
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.8*"/>
+                                <ColumnDefinition Width="0.2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" 
+                                     IsReadOnly="True"
+                                     Text="{Binding SelectedRecipe.PatMaxToolPath}"/>
+                            <Button Grid.Column="1" 
+                                    HorizontalAlignment="Center" Width="70" Content="..."
+                                    Command="{Binding BtnSelectImageSavePathCommand}"
+                                    CommandParameter="{x:Static enum:PathType.VisionProPatMaxToolPath}"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Margin="5" Header="Affine Tool Path">
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.8*"/>
+                                <ColumnDefinition Width="0.2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" 
+                                     IsReadOnly="True"
+                                     Text="{Binding SelectedRecipe.AffineToolPath}"/>
+                            <Button Grid.Column="1" 
+                                    HorizontalAlignment="Center" Width="70" Content="..."
+                                    Command="{Binding BtnSelectImageSavePathCommand}"
+                                    CommandParameter="{x:Static enum:PathType.VisionProAffineToolPath}"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Margin="5" Header="ID Tool Path">
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.8*"/>
+                                <ColumnDefinition Width="0.2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" 
+                                     IsReadOnly="True"
+                                     Text="{Binding SelectedRecipe.IDToolPath}"/>
+                            <Button Grid.Column="1" 
+                                    HorizontalAlignment="Center" Width="70" Content="..."
+                                    Command="{Binding BtnSelectImageSavePathCommand}"
+                                    CommandParameter="{x:Static enum:PathType.VisionProIDToolPath}"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Margin="5" Header="ROI Parameter">
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            
+                            <Label Grid.Column="0" Grid.Row="0" Margin="5,0,5,5"
+                                   VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                                   Foreground="#333333" FontSize="14" Background="DarkGray"
+                                   Content="Barcode Width"/>
+                            <TextBox Grid.Column="0" Grid.Row="1" Margin="5,0"
+                                     Height="30" 
+                                     Text="{Binding SelectedRecipe.BarcodeWidth, UpdateSourceTrigger=PropertyChanged}"/>
+                            
+                            <Label Grid.Column="1" Grid.Row="0" Margin="5,0,5,5"
+                                   VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                                   Foreground="#333333" FontSize="14" Background="DarkGray"
+                                   Content="Barcode Height"/>
+                            <TextBox Grid.Column="1" Grid.Row="1" Margin="5,0"
+                                     Height="30"
+                                     Text="{Binding SelectedRecipe.BarcodeHeight, UpdateSourceTrigger=PropertyChanged}"/>
+
+                            <Label Grid.Column="2" Grid.Row="0" Margin="5,0,5,5"
+                                   VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                                   Foreground="#333333" FontSize="14" Background="DarkGray"
+                                   Content="Barcode Color"/>
+                            <wpfx:ColorPicker Grid.Column="2" Grid.Row="1" Margin="5,0" 
+                                              Height="30" DisplayColorAndName="True" 
+                                              SelectedColor="{Binding BarcodeColor}">
+                                <b:Interaction.Triggers>
+                                    <b:EventTrigger EventName="SelectedColorChanged">
+                                        <b:InvokeCommandAction Command="{Binding BarcodeColorChangedCommand}" CommandParameter="{Binding SelectedRecipe}"/>
+                                    </b:EventTrigger>
+                                </b:Interaction.Triggers>
+                            </wpfx:ColorPicker>
+
+                            <Label Grid.Column="3" Grid.Row="0" Margin="5,0,5,5"
+                                   VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                                   Foreground="#333333" FontSize="14" Background="DarkGray"
+                                   Content="Box Color"/>
+                            <wpfx:ColorPicker x:Name="BoxColorPicker" Grid.Column="3" Grid.Row="1" Margin="5,0" 
+                                              Height="30" DisplayColorAndName="True"
+                                              SelectedColor="{Binding BoxColor}">
+                                <b:Interaction.Triggers>
+                                    <b:EventTrigger EventName="SelectedColorChanged">
+                                        <b:InvokeCommandAction Command="{Binding BoxColorChangedCommand}" CommandParameter="{Binding SelectedRecipe}"/>
+                                    </b:EventTrigger>
+                                </b:Interaction.Triggers>
+                            </wpfx:ColorPicker>
+
+                            <Label Grid.Column="4" Grid.Row="0" Margin="5,0,5,5"
+                                   VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                                   Foreground="#333333" FontSize="14" Background="DarkGray"
+                                   Content="PenSize"/>
+                            <TextBox Grid.Column="4" Grid.Row="1" Margin="5,0"
+                                     Height="30"
+                                     Text="{Binding SelectedRecipe.PenSize, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                    </GroupBox>
+                </StackPanel>
             </TabItem>
 
             <TabItem Header="Data Setting" Background="#333333" Foreground="LightGray">
-
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Margin="5" Header="Save Path">
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.8*"/>
+                                <ColumnDefinition Width="0.2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" 
+                                     IsReadOnly="True"
+                                     Text="{Binding SettingManager.AppSetting.DataSetting.SavePath}"/>
+                            <Button Grid.Column="1" 
+                                    HorizontalAlignment="Center" Width="70" Content="..."
+                                    Command="{Binding BtnSelectImageSavePathCommand}"
+                                    CommandParameter="{x:Static enum:PathType.DataSavePath}"/>
+                            
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Margin="5" Header="Send Path">
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.8*"/>
+                                <ColumnDefinition Width="0.2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" 
+                                     IsReadOnly="True"
+                                     Text="{Binding SettingManager.AppSetting.DataSetting.SendPath}"/>
+                            <Button Grid.Column="1" 
+                                    HorizontalAlignment="Center" Width="70" Content="..."
+                                    Command="{Binding BtnSelectImageSavePathCommand}"
+                                    CommandParameter="{x:Static enum:PathType.DataSendPath}"/>
+                        </Grid>
+                    </GroupBox>
+                </StackPanel>
             </TabItem>
         </TabControl>
     </Grid>

@@ -3,12 +3,14 @@ using Service.Camera.Models;
 using Service.CustomException.Models.ErrorTypes;
 using Service.CustomException.Services.ErrorService.HandledExceptions;
 using Service.Logger.Services;
+using Service.Setting.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Service.Camera.Services
 {
@@ -16,7 +18,12 @@ namespace Service.Camera.Services
     {
         private VirtualFG40Library _vfg = new VirtualFG40Library();
         private LogWrite _logWrite = LogWrite.Instance;
+        private ISettingManager _settingManager;
         public Dictionary<string, ICamera> CameraDic { get; set; } = new Dictionary<string, ICamera>();
+        public CameraManager(ISettingManager sm)
+        {
+            _settingManager = sm;
+        }
 
         public void Opens()
         {
@@ -26,6 +33,10 @@ namespace Service.Camera.Services
                 UpdateDevice();
 
                 uint camCount = CanOpenCameraNum();
+                if(camCount == 0 ) 
+                {
+                    _logWrite?.Error($"Camera Init Fail (Cam Count - {camCount})");
+                }
                 for (uint i = 0; i < camCount; i++)
                 {
                     TryConnect(i, CameraDic);

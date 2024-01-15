@@ -38,7 +38,7 @@ namespace Dialog.DirectorySelecton.ViewModels
 
         private void OnImageDirectoryOpen()
         {
-            try { Process.Start(_appSetting.ImageSetting.SavePath); }
+            try { Process.Start(_appSetting.ImageSetting.InspectionImageSavePath); }
             catch (Exception err) { _logWrite?.Error(err, true, true); }
         }
 

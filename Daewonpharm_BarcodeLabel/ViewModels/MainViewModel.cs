@@ -3,13 +3,15 @@ using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using PrismTemplate.Services.TimeServices;
+using Service.Camera.Models;
+using Service.ConnectionCheck.Services;
+using Service.Database.Services;
 using Service.Logger.Services;
+using Service.Postprocessing.Services;
+using Service.VisionPro.Services;
+using Services.ImageMerge.Services;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace BarcodeLabel.Main.ViewModels
@@ -20,6 +22,12 @@ namespace BarcodeLabel.Main.ViewModels
         private WindowState _windowState;
         private SystemTimeService _timeService = new SystemTimeService();
         private IEventAggregator _eventAggregator;
+        private ICameraManager _camManager;
+        private IVisionProManager _vpManager;
+        private IImageMergeManager _imManager;
+        private IPostprocessingManager _postprocessingManager;
+        private ISQLiteManager _sqlLiteManager;
+        private IConnectionCheckManager _ccManager;
         private string _version;
 
         public WindowState WindowState { get => _windowState; set => SetProperty(ref _windowState, value); }
@@ -30,10 +38,15 @@ namespace BarcodeLabel.Main.ViewModels
         public DelegateCommand<CancelEventArgs> ClosingCommand => new DelegateCommand<CancelEventArgs>(OnClosing);
         public DelegateCommand BtnMinimizeCommand => new DelegateCommand(OnMinimize);
 
-        public MainViewModel(IEventAggregator ea) 
+        public MainViewModel(IEventAggregator ea, ICameraManager cm, IVisionProManager vm, IImageMergeManager imManager, IPostprocessingManager postprocessingManager, ISQLiteManager sqliteManager, IConnectionCheckManager ccm) 
         {
             _eventAggregator = ea;
-            
+            _camManager = cm;
+            _vpManager = vm;
+            _imManager = imManager;
+            _postprocessingManager = postprocessingManager;
+            _ccManager = ccm;
+            _sqlLiteManager = sqliteManager;
         }
 
         private void OnLoaded()
@@ -49,6 +62,21 @@ namespace BarcodeLabel.Main.ViewModels
             {
                 // TODO : Dispose 구현해야함
                 _logWrite?.Info("Application Closing...");
+
+                try
+                {
+                    _camManager.Closes();
+                    _vpManager.Dispose();
+                    _imManager.Dispose();
+                    _postprocessingManager.Dispose();
+                    _ccManager.Dispose();
+                    _sqlLiteManager.Dispose();
+                }
+                catch 
+                {
+                    Environment.Exit(0);
+                    Application.Current.Shutdown();
+                }
                 _eventAggregator.GetEvent<AppClosingEvent>().Publish();
             }
             else

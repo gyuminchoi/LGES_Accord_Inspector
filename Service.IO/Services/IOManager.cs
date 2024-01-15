@@ -6,6 +6,7 @@ using Service.Logger.Services;
 using Service.Pattern;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -21,7 +22,6 @@ namespace Service.IO.Services
         private Thread _fnIOSignalCheckThread = new Thread(() => { });
         private IntPtr _hSystem = new IntPtr();
         private IntPtr _hDevice = new IntPtr();
-        public string Version = "1.0.0";
         public List<IOSlot> DOutputs { get; set; } = new List<IOSlot>();
         public List<IOSlot> DInputs { get; set; } = new List<IOSlot>();
         public List<IOSlot> AInputs { get; set; } = new List<IOSlot>();
@@ -430,6 +430,24 @@ namespace Service.IO.Services
             }
         }
 
+        public bool CheckInternalBus()
+        {
+            if (!IsOpen) return false;
+
+            int intVal = 0;
+            int status = _fnIO.FNIO_DevGetParam(_hDevice, CrevisFnIO.DEV_DEVICE_BUS_STATUS, ref intVal);
+            if (status != 0) return false;
+            
+            string strVal = intVal.ToString("X");
+
+            if (strVal == "0") return true;
+            else 
+            {
+                InternalBusToLog(strVal);
+                return false;
+            }
+        }
+
         public void ReadOutputBit(int slotIndex, int bitIndex, ref bool bitValue)
         {
             int bitNum = 0;
@@ -539,6 +557,48 @@ namespace Service.IO.Services
             //{
             //    _logWrite?.Error(err);
             //}
+        }
+
+        private void InternalBusToLog(string busState)
+        {
+            switch (busState)
+            {
+                case "80":
+                    _logWrite?.Info($"{busState} : NO FIELD POWER");
+                    break;
+                case "1":
+                    _logWrite?.Info($"{busState} : COMMUNICATION_FAULT");
+                    break;
+                case "2":
+                    _logWrite?.Info($"{busState} : CONNECT_FAULT");
+                    break;
+                case "3":
+                    _logWrite?.Info($"{busState} : CONFIG_FAULT");
+                    break;
+                case "4":
+                    _logWrite?.Info($"{busState} : NO_EXPANSION");
+                    break;
+                case "5":
+                    _logWrite?.Info($"{busState} : NVALID_ATTR_VALUE");
+                    break;
+                case "6":
+                    _logWrite?.Info($"{busState} : TOO_MUCH_DATA");
+                    break;
+                case "7":
+                    _logWrite?.Info($"{busState} : VENDOR_ERROR");
+                    break;
+                case "8":
+                    _logWrite?.Info($"{busState} : NOT_EXPECTED_SLOT");
+                    break;
+                case "9":
+                    _logWrite?.Info($"{busState} : CRC_ERROR");
+                    break;
+                case "0":
+                    break;
+                default:
+                    _logWrite?.Info($"{busState} : 2 or more problems");
+                    break;
+            }
         }
     }
 }

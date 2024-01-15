@@ -62,7 +62,7 @@ namespace Dialog.LiveCam.ViewModels
                 _camManager.GrabStarts();
 
                 foreach (var liveCam in LiveCams)
-                  {
+                {
                     liveCam.Camera.ContinueSWTrigExecute();
                 }
 
@@ -102,7 +102,7 @@ namespace Dialog.LiveCam.ViewModels
         {
             foreach (var item in _camManager.CameraDic)
             {
-                var camConfig = new LiveCamera(item.Value, _settingManager.AppSetting.GeneralSetting);
+                var camConfig = new LiveCamera(item.Value, _settingManager.AppSetting.ImageSetting);
 
                 if (LiveCams.Count == 0)
                 {

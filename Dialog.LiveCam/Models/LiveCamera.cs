@@ -28,7 +28,7 @@ namespace Dialog.LiveCam.Models
         private BitmapConverter _bmpConverter = BitmapConverter.Instance;
         private LogWrite _logWrite = LogWrite.Instance;
         private ICamera _camera;
-        private GeneralSetting _generalSetting;
+        private ImageSetting _imageSetting;
         private BitmapImage _imageViewer;
         private ulong _packetLossCount;
         private int _row;
@@ -55,16 +55,16 @@ namespace Dialog.LiveCam.Models
         public DelegateCommand<object> TxbExpTimeKeyDownCommand => new DelegateCommand<object>(OnChangeExeposureTimeVal);
         public DelegateCommand BtnImageSaveCommand => new DelegateCommand(OnSaveImage);
 
-
-        public LiveCamera(ICamera cam, GeneralSetting gs)
+        
+        public LiveCamera(ICamera cam, ImageSetting @is)
         {
             Camera = cam;
-            _generalSetting = gs;
+            _imageSetting = @is;
 
             CurrentExeTime = Camera.CamConfig.ExposeureTime;
             CurrentGain = Camera.CamConfig.Gain;
 
-            Camera.ReceiveImageDataEnqueueComplete += DataEnqueueComplete;
+            Camera.ReceiveRawDataEnqueueComplete += DataEnqueueComplete;
 
             //Thread thread = new Thread(() => 
             //{
@@ -131,7 +131,7 @@ namespace Dialog.LiveCam.Models
         private string CreateDirectory()
         {
             string date = DateTime.Now.ToString("yy_MM_dd");
-            string directory = Path.Combine(_generalSetting.LiveImageSavePath, date);
+            string directory = Path.Combine(_imageSetting.LiveImageSavePath, date);
 
             Directory.CreateDirectory(directory);
             return directory;
@@ -160,17 +160,31 @@ namespace Dialog.LiveCam.Models
 
         private void DataEnqueueComplete(object sender, string e)
         {
-            if (!Camera.ReceiveImageDatas.TryDequeue(out Bitmap bmp))
-                return;
-
-            ImageViewer = _bmpConverter.BitmapToBitmapImage(bmp);
-            FrameCount++;
+            ThreadPool.QueueUserWorkItem(RawDataToBitmapImage, e);
         }
 
+        private void RawDataToBitmapImage(object camUserID)
+        {
+            string userID = camUserID.ToString();
+
+            if (!Camera.RawDatas.TryDequeue(out byte[] rawData))
+                return;
+
+            BitmapData bmpData = new BitmapData();
+            bmpData.Stride = _camera.CamConfig.Stride;
+            bmpData.Height = _camera.CamConfig.Height;
+            bmpData.Width = _camera.CamConfig.Width;
+            bmpData.PixelFormat = _camera.CamConfig.BitmapPixelFormat;
+
+            Bitmap bmp = _bmpConverter.ByteArrayToBitmap(bmpData, rawData, _camera.CamConfig.BitmapPixelFormat);
+            ImageViewer = _bmpConverter.BitmapToBitmapImage(bmp);
+            FrameCount++;
+            bmp.Dispose();
+        }
 
         public void Dispose()
         {
-            Camera.ReceiveImageDataEnqueueComplete -= DataEnqueueComplete;
+            Camera.ReceiveRawDataEnqueueComplete -= DataEnqueueComplete;
         }
     }
 }

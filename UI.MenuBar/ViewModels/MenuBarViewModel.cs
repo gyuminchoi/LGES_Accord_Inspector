@@ -26,7 +26,7 @@ namespace UI.MenuBar.ViewModels
         public DelegateCommand BtnDirectoryCommmand => new DelegateCommand(OnShowSelectionDirectoryDialog);
         public DelegateCommand BtnSettingCommand => new DelegateCommand(OnShowSettingDialog);
         public DelegateCommand BtnLiveCamCommand => new DelegateCommand(OnShowLiveCamDialog);
-
+        public DelegateCommand BtnHistoryCommand => new DelegateCommand(OnShowHistoryDialog);
 
         public MenuBarViewModel(IDialogService ds, IEventAggregator ea)
         {
@@ -65,6 +65,11 @@ namespace UI.MenuBar.ViewModels
         private void OnShowLiveCamDialog()
         {
             _dialogService.ShowDialog("LiveCamDialog");
+        }
+
+        private void OnShowHistoryDialog()
+        {
+            _dialogService.Show("HistoryDialog");
         }
     }
 }

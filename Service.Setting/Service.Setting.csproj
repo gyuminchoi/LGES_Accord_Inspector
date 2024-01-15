@@ -57,6 +57,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,10 +67,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\AppSetting.cs" />
+    <Compile Include="Models\DataBaseSetting.cs" />
     <Compile Include="Models\DataSetting.cs" />
     <Compile Include="Models\GeneralSetting.cs" />
     <Compile Include="Models\ImageSetting.cs" />
+    <Compile Include="Models\IOData.cs" />
     <Compile Include="Models\IOSetting.cs" />
+    <Compile Include="Models\VisionProRecipe.cs" />
+    <Compile Include="Models\VisionProSetting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ISettingManager.cs" />
     <Compile Include="Services\SettingManager.cs" />

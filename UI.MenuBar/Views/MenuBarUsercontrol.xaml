@@ -14,17 +14,18 @@
              
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel Orientation="Horizontal" >
+    <StackPanel Orientation="Horizontal">
         <!--<Button Width="90" Height="90" Command="{Binding BtnLoginClick}">
             <StackPanel>
                 <iconPacks:PackIconVaadinIcons Kind="Key" HorizontalAlignment="Center" Width="50" Height="50" />
                 <Label Content="Login" HorizontalAlignment="Center"/>
             </StackPanel>
         </Button>-->
-        <Button Width="90" Height="90">
+        <Button Margin="3" Width="90" Height="90" Background="#333333" BorderBrush="LightGray" Foreground="LightGray"
+                Command="{Binding BtnHistoryCommand}">
             <StackPanel>
                 <iconPacks:PackIconMaterial Kind="DatabaseSearchOutline" HorizontalAlignment="Center" Width="50" Height="50"/>
-                <Label FontSize="12" Content="History" HorizontalAlignment="Center"/>
+                <Label FontSize="12" Content="History" HorizontalAlignment="Center" Foreground="LightGray"/>
             </StackPanel>
         </Button>
         <!--<Button Width="90" Height="90">
@@ -33,32 +34,33 @@
                 <Label Content="Simulation" HorizontalAlignment="Center"/>
             </StackPanel>
         </Button>-->
-        <Button Width="90" Height="90" 
+        <Button Margin="3" Width="90" Height="90" Background="#333333" BorderBrush="LightGray" Foreground="LightGray"
                 IsEnabled="{Binding IsEnabledLiveCam}"
                 Command="{Binding BtnLiveCamCommand}">
             <StackPanel>
                 <iconPacks:PackIconMaterial Kind="CameraWireless" HorizontalAlignment="Center" Width="50" Height="50" />
-                <Label FontSize="12" Content="Live Cam" HorizontalAlignment="Center"/>
+                <Label FontSize="12" Content="Live Cam" HorizontalAlignment="Center"  Foreground="LightGray"/>
             </StackPanel>
         </Button>
-        <Button Width="90" Height="90" 
+        <Button Margin="3" Width="90" Height="90" Background="#333333" BorderBrush="LightGray" Foreground="LightGray"
                 IsEnabled="{Binding IsEnabledSetting}"
                 Command="{Binding BtnSettingCommand}">
             <StackPanel>
                 <iconPacks:PackIconSimpleIcons Kind="Svgo" HorizontalAlignment="Center" Width="50" Height="50"/>
-                <Label FontSize="12" Content="Setting" HorizontalAlignment="Center"/>
+                <Label FontSize="12" Content="Setting" HorizontalAlignment="Center"  Foreground="LightGray"/>
             </StackPanel>
         </Button>
-        <Button Width="90" Height="90" Command="{Binding BtnDirectoryCommmand}">
+        <Button Margin="3" Width="90" Height="90" Background="#333333" BorderBrush="LightGray" Foreground="LightGray"
+                Command="{Binding BtnDirectoryCommmand}">
             <StackPanel>
                 <iconPacks:PackIconFontAwesome Kind="FolderOpenSolid" HorizontalAlignment="Center" Width="50" Height="50" />
-                <Label FontSize="12" Content="Directory" HorizontalAlignment="Center"/>
+                <Label FontSize="12" Content="Directory" HorizontalAlignment="Center"  Foreground="LightGray"/>
             </StackPanel>
         </Button>
-        <Button Width="90" Height="90">
+        <Button Margin="3" Width="90" Height="90" Background="#333333" BorderBrush="LightGray" Foreground="LightGray">
             <StackPanel>
                 <iconPacks:PackIconModern Kind="Reset" HorizontalAlignment="Center" Width="50" Height="50"/>
-                <Label FontSize="12" Content="Reset" HorizontalAlignment="Center"/>
+                <Label FontSize="12" Content="Reset" HorizontalAlignment="Center"  Foreground="LightGray"/>
             </StackPanel>
         </Button>
     </StackPanel>

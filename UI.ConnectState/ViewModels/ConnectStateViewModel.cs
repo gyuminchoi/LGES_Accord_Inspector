@@ -5,6 +5,9 @@ using Prism.Mvvm;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using Service.Camera.Models;
+using Service.ConnectionCheck.Models;
+using Service.ConnectionCheck.Services;
+using Service.Database.Services;
 using Service.IO.Services;
 using System;
 using System.Collections.Generic;
@@ -21,56 +24,47 @@ namespace UI.ConnectState.ViewModels
         private IDialogService _dialogService;
         private IEventAggregator _eventAggregator;
         private ICameraManager _cameraManager;
+        private IConnectionCheckManager _ccManager;
+        private ISQLiteManager _sqliteManager;
         private ServicesInitCompleteEvent _servicesInitCompleteEvent;
         private AppClosingEvent _appClosingEvent;
         private Thread _stateCheckThread = new Thread(() => { });
+        private ServiceState _state;
         private bool _isStateCheck = false;
         private bool _isCameraState = false;
 
         public bool IsCameraState { get => _isCameraState; set => SetProperty(ref _isCameraState, value); } 
-
+        public ServiceState State { get => _state; set => SetProperty(ref _state, value); }
         public DelegateCommand BtnCameraCommand => new DelegateCommand(OnShowCameraStateDialog);
         public DelegateCommand BtnIOStateCommand => new DelegateCommand(OnShowIOStateDialog);
-        public DelegateCommand BtnSensorCommand => new DelegateCommand(OnShowSensorStateDialog);
+        public DelegateCommand BtnDatabaseCommand => new DelegateCommand(OnShowDatabaseStateDialog);
         public DelegateCommand BtnVisionProCommand => new DelegateCommand(OnShowVisionProDialog);
 
 
-        public ConnectStateViewModel(IDialogService ds, IEventAggregator ea, ICameraManager cm)
+        public ConnectStateViewModel(IDialogService ds, IEventAggregator ea, ICameraManager cm, IConnectionCheckManager ccm, ISQLiteManager sqliteManager)
         {
             _dialogService = ds;
             _eventAggregator = ea;
             _cameraManager = cm;
+            _ccManager = ccm;
+            _sqliteManager = sqliteManager;
 
             _servicesInitCompleteEvent = _eventAggregator.GetEvent<ServicesInitCompleteEvent>();
             _servicesInitCompleteEvent.Subscribe(OnStateCheckStart);
 
             _appClosingEvent = _eventAggregator.GetEvent<AppClosingEvent>();
             _appClosingEvent.Subscribe(OnClosing);
-
         }
 
         private void OnClosing() => Dispose();
 
         private void OnStateCheckStart()
         {
-            _isStateCheck = true;
-
-            _stateCheckThread = new Thread(new ThreadStart(StateCheckProcess));
-            _stateCheckThread.Name = "LiveCam Thread";
-            _stateCheckThread.Start();
+            State = _ccManager.ServiceStates;
+            _ccManager.Start();
         }
 
-        private void StateCheckProcess()
-        {
-            while (_isStateCheck)
-            {
-                List<bool> camStates = _cameraManager.OpenChecks();
-                if(camStates.Any(flag => flag == false)) IsCameraState = false;
-                else IsCameraState = true;
-
-                Thread.Sleep(1000);
-            }
-        }
+        
 
         private void StateCheckStop()
         {
@@ -87,13 +81,17 @@ namespace UI.ConnectState.ViewModels
         {
             _dialogService.Show("CameraStateDialog");
         }
+
         private void OnShowIOStateDialog()
         {
             _dialogService.Show("IOMonitorDialog");
         }
-        private void OnShowSensorStateDialog()
+
+        private void OnShowDatabaseStateDialog()
         {
+            _dialogService.Show("DatabaseStateDialog");
         }
+
         private void OnShowVisionProDialog()
         {
         }

@@ -94,6 +94,7 @@ namespace Dialog.IOMonitor.ViewModels
 
         public void OnDialogOpened(IDialogParameters parameters)
         {
+            _logWrite?.Info("Complete I / O state dialog init");
         }
 
         /// <summary>

@@ -67,6 +67,7 @@
     <Compile Include="Models\ErrorTypes\EParseError.cs" />
     <Compile Include="Models\ErrorTypes\ESerialPortError.cs" />
     <Compile Include="Models\ErrorTypes\EThreadError.cs" />
+    <Compile Include="Models\ErrorTypes\EVisionProError.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ConvertService\EnumValueConverter.cs" />
     <Compile Include="Services\ErrorService\HandledExceptions\BootstrapperException.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Services\ErrorService\HandledExceptions\ParseFailException.cs" />
     <Compile Include="Services\ErrorService\HandledExceptions\SerialPortException.cs" />
     <Compile Include="Services\ErrorService\HandledExceptions\ThreadException.cs" />
+    <Compile Include="Services\ErrorService\HandledExceptions\VisionProException.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

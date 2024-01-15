@@ -24,31 +24,41 @@
         <!-- Top Viewer -->
         <Border Grid.Column="0" Margin="0,0,5,0" BorderBrush="DarkGray" BorderThickness="2">
             <Grid>
-                <StackPanel>
-                    <!-- Info -->
-                    <TextBlock Margin="5"
-                               FontSize="18" Foreground="#9EF048" FontWeight="Bold"
-                               Text="상부"/>
-
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="5"
-                                           FontSize="14" Foreground="#9EF048" 
-                                           Text="Quantity found : "/>
-                        <TextBlock Margin="5"
-                                           FontSize="14" Foreground="#9EF048" 
-                                           Text="{Binding TopQuantity}"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="5"
-                                           FontSize="14" Foreground="#9EF048" 
-                                           Text="Frame Count : "/>
-                        <TextBlock Margin="5"
-                                           FontSize="14" Foreground="#9EF048" 
-                                           Text="{Binding TopFrameCount}"/>
-                    </StackPanel>
-                </StackPanel>
+                <Grid Panel.ZIndex="2" Width="140" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left" Background="DarkGray" Opacity="0.8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Grid.ColumnSpan="2" Margin="3"
+                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                           Background="#333333" Foreground="#9EF048" FontWeight="Bold" FontSize="18"
+                           Content="상부"/>
+                    <!-- Box Count -->
+                    <Label Grid.Row="1" Grid.Column="0" Margin="3"
+                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                           Background="#333333" Foreground="#9EF048" FontSize="14"
+                           Content="Box"/>
+                    <Label Grid.Row="1" Grid.Column="1" Margin="3"
+                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                           Background="#333333" Foreground="#9EF048" FontSize="14"
+                           Content="{Binding TopBoxCount}"/>
+                    <!-- Barcode Count -->
+                    <Label Grid.Row="2" Grid.Column="0" Margin="3"
+                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                           Background="#333333" Foreground="#9EF048" FontSize="14"
+                           Content="Barcode"/>
+                    <Label Grid.Row="2" Grid.Column="1" Margin="3"
+                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                           Background="#333333" Foreground="#9EF048" FontSize="14"
+                           Content="{Binding TopBarcodeCount}"/>
+                </Grid> 
+                
                 <!-- Image -->
-                <Image Panel.ZIndex="0" Source="{Binding TopOriginImg}"/>
                 <Image Panel.ZIndex="1" Source="{Binding TopOverlayImg}"/>
             </Grid>
         </Border>
@@ -56,32 +66,40 @@
         <!-- Bottom Viewer -->
         <Border Grid.Column="1" Margin="5,0,0,0" BorderBrush="DarkGray" BorderThickness="2">
             <Grid>
-                <StackPanel>
-                    <!-- Info -->
-                    <TextBlock Margin="5"
-                               FontSize="18" Foreground="#9EF048" FontWeight="Bold"
-                               Text="하부"/>
-
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="5"
-                                           FontSize="14" Foreground="#9EF048" 
-                                           Text="Quantity found : "/>
-                        <TextBlock Margin="5"
-                                           FontSize="14" Foreground="#9EF048" 
-                                           Text="{Binding BottomQuantity}"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="5"
-                                           FontSize="14" Foreground="#9EF048" 
-                                           Text="Frame Count : "/>
-                        <TextBlock Margin="5"
-                                           FontSize="14" Foreground="#9EF048" 
-                                           Text="{Binding BottomFrameCount}"/>
-                    </StackPanel>
-                </StackPanel>
+                <Grid Panel.ZIndex="2" Width="140" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left" Background="DarkGray" Opacity="0.8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Grid.ColumnSpan="2" Margin="3"
+                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                           Background="#333333" Foreground="#9EF048" FontWeight="Bold" FontSize="18"
+                           Content="하부"/>
+                    <!-- Box Count -->
+                    <Label Grid.Row="1" Grid.Column="0" Margin="3"
+                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                           Background="#333333" Foreground="#9EF048" FontSize="14"
+                           Content="Box"/>
+                    <Label Grid.Row="1" Grid.Column="1" Margin="3"
+                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                           Background="#333333" Foreground="#9EF048" FontSize="14"
+                           Content="{Binding BottomBoxCount}"/>
+                    <!-- Barcode Count -->
+                    <Label Grid.Row="2" Grid.Column="0" Margin="3"
+                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                           Background="#333333" Foreground="#9EF048" FontSize="14"
+                           Content="Barcode"/>
+                    <Label Grid.Row="2" Grid.Column="1" Margin="3"
+                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                           Background="#333333" Foreground="#9EF048" FontSize="14"
+                           Content="{Binding BottomBarcodeCount}"/>
+                </Grid>
                 <!-- Image -->
-                <Image Panel.ZIndex="0" Source="{Binding BottomOriginImg}"/>
                 <Image Panel.ZIndex="1" Source="{Binding BottomOverlayImg}"/>
             </Grid>
         </Border>

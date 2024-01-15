@@ -40,8 +40,8 @@
                        FontSize="30" Foreground="LightGray" FontWeight="Bold"
                        VerticalAlignment="Center" HorizontalAlignment="Left" 
                        Text="Connected Camera : "/>
-            <TextBlock 
-                       FontSize="30" FontWeight="Bold"
+            
+            <TextBlock FontSize="30" FontWeight="Bold"
                        Foreground="{Binding Cams.Count, Converter={StaticResource CountToColorConverter}}"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Text="{Binding Cams.Count}"/>

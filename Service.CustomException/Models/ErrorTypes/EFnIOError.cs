@@ -34,5 +34,7 @@ namespace Service.CustomException.Models.ErrorTypes
         FnIOReadInputByteFail,
         [Description("FnIO signal check thread die!")]
         FnIOSignalCheckThreadDie,
+        [Description("FnIO bus status check fail!")]
+        FnIOBusCheckFail,
     }
 }

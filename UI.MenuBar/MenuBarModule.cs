@@ -1,11 +1,15 @@
 ﻿using Dialog.AppSetting.ViewModels;
 using Dialog.AppSetting.Views;
 using Dialog.DirectorySelecton.Views;
+using Dialog.History.ViewModels;
+using Dialog.History.Views;
 using Dialog.LiveCam.ViewModels;
 using Dialog.LiveCam.Views;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
+using Service.Database.Models;
+using System.Collections.ObjectModel;
 using UI.MenuBar.ViewModels;
 using UI.MenuBar.Views;
 
@@ -14,6 +18,7 @@ namespace UI.MenuBar.Modules
     public class MenuBarModule : IModule
     {
         private IRegionManager _regionManager;
+
         public MenuBarModule(IRegionManager rm) 
         {
             _regionManager = rm;
@@ -29,6 +34,7 @@ namespace UI.MenuBar.Modules
             containerRegistry.RegisterForNavigation<DirectorySelectionWindow>();
             containerRegistry.RegisterDialog<AppSettingDialog, AppSettingViewModel>();
             containerRegistry.RegisterDialog<LiveCamDialog, LiveCamViewModel>();
+            containerRegistry.RegisterDialog<HistoryDialog, HistoryViewModel>();
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Dialog.CameraState.ViewModels;
 using Dialog.CameraState.Views;
+using Dialog.DatabaseState.ViewModels;
+using Dialog.DatabaseState.Views;
 using Dialog.IOMonitor.ViewModels;
 using Dialog.IOMonitor.Views;
 using Prism.Ioc;
@@ -36,6 +38,7 @@ namespace UI.ConnectState
 
             containerRegistry.RegisterDialog<CameraStateDialog, CameraStateViewModel>();
             containerRegistry.RegisterDialog<IOMonitorDialog, IOMonitorViewModel>();
+            containerRegistry.RegisterDialog<DatabaseStateDialog, DatabaseStateViewModel>();
         }
     }
 }
