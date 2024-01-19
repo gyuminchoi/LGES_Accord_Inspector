@@ -60,6 +60,10 @@
                 
                 <!-- Image -->
                 <Image Panel.ZIndex="1" Source="{Binding TopOverlayImg}"/>
+                <StackPanel Orientation="Horizontal" Panel.ZIndex="2" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                    <TextBlock Text="Count : "/>
+                    <TextBlock Text="{Binding TopCount}"/>
+                </StackPanel>
             </Grid>
         </Border>
         
@@ -101,6 +105,11 @@
                 </Grid>
                 <!-- Image -->
                 <Image Panel.ZIndex="1" Source="{Binding BottomOverlayImg}"/>
+                
+                <StackPanel Orientation="Horizontal" Panel.ZIndex="2" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                    <TextBlock Text="Count : "/>
+                    <TextBlock Text="{Binding BotCount}"/>
+                </StackPanel>
             </Grid>
         </Border>
     </Grid>

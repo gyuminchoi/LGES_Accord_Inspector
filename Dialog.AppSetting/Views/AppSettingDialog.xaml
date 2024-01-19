@@ -42,17 +42,17 @@
                     <GroupBox Margin="5" Header="Save Whether">
                         <StackPanel Orientation="Horizontal">
                             <StackPanel Margin="5" Orientation="Horizontal">
-                                <TextBlock Margin="5" VerticalAlignment="Center" Text="Overlay Image"/>
+                                <TextBlock Margin="5" VerticalAlignment="Center" Text="Image Save"/>
                                 <CheckBox VerticalAlignment="Center" 
                                           Foreground="LightGray" 
-                                          IsChecked="{Binding SettingManager.AppSetting.ImageSetting.IsSaveOverlay}"/>
+                                          IsChecked="{Binding SettingManager.AppSetting.ImageSetting.IsSaveImage}"/>
                             </StackPanel>
 
                             <StackPanel Margin="5" Orientation="Horizontal">
-                                <TextBlock Margin="5" VerticalAlignment="Center" Text="Original Image"/>
+                                <TextBlock Margin="5" VerticalAlignment="Center" Text="Image Compression"/>
                                 <CheckBox VerticalAlignment="Center" 
                                           Foreground="LightGray"
-                                          IsChecked="{Binding SettingManager.AppSetting.ImageSetting.IsSaveOriginal}"/>
+                                          IsChecked="{Binding SettingManager.AppSetting.ImageSetting.IsCompression}"/>
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>

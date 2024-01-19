@@ -13,15 +13,15 @@ namespace Service.Postprocessing.Models
         public Bitmap OverlayBmp { get; set; }
         public VisionProResult VisionProResult { get; set; }
 
-        public PostprocessingResult()
+        public PostprocessingResult(VisionProResult vpResult)
         {
-
+            VisionProResult = vpResult;
         }
 
         public void Dispose()
         {
-            OverlayBmp.Dispose();
-            VisionProResult.Dispose();
+            if(OverlayBmp != null) OverlayBmp.Dispose();
+            if(VisionProResult != null) VisionProResult.Dispose();
         }
     }
 }

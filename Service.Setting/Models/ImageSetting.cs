@@ -12,20 +12,20 @@ namespace Service.Setting.Models
     public class ImageSetting : BindableBase
     {
         private LogWrite _logWrite = LogWrite.Instance;
-        private bool? _isSaveOverlay;
-        private bool? _isSaveOriginal;
+        private bool? _isCompression;
+        private bool? _isSaveImage;
         private string _inspectionImageSavePath;
         private string _liveImageSavePath;
-
-        public bool? IsSaveOverlay { get => _isSaveOverlay; set => SetProperty(ref _isSaveOverlay, value); }
-        public bool? IsSaveOriginal { get => _isSaveOriginal; set => SetProperty(ref _isSaveOriginal, value); }
+        //TODO : 여기 압축여부, 이미지 저장 여부로 변경해야함
+        public bool? IsCompression { get => _isCompression; set => SetProperty(ref _isCompression, value); }
+        public bool? IsSaveImage { get => _isSaveImage; set => SetProperty(ref _isSaveImage, value); }
         public string InspectionImageSavePath { get => _inspectionImageSavePath; set => SetProperty(ref _inspectionImageSavePath, value); }
         public string LiveImageSavePath { get => _liveImageSavePath; set => SetProperty(ref _liveImageSavePath, value); }
 
-        public ImageSetting(bool isSaveOverlay, bool isSaveOriginal, string inspectionImageSavePath, string liveImageSavePath) 
+        public ImageSetting(bool isCompression, bool isSaveImage, string inspectionImageSavePath, string liveImageSavePath) 
         {
-            IsSaveOverlay = isSaveOverlay;
-            IsSaveOriginal = isSaveOriginal;
+            IsCompression = isCompression;
+            IsSaveImage = isSaveImage;
             InspectionImageSavePath = inspectionImageSavePath;
             LiveImageSavePath = liveImageSavePath;
         }

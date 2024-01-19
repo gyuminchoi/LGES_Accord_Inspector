@@ -23,8 +23,6 @@ namespace Service.Database.Services
         private SQLiteConnection _dbConnector;
         private DataBaseSetting _dbSetting;
         private bool _isConnection = false;
-        private string _state;
-        private object _stateLock = new object();
         
         public bool IsOpen { get => _isConnection; set => SetProperty(ref _isConnection, value); }
 
@@ -144,6 +142,8 @@ namespace Service.Database.Services
                     return;
                 }
 
+                string strDateTime = data.DateTime.ToString("yyyy.MM.dd HH:mm:ss");
+
                 StringBuilder sb = new StringBuilder(4096);
                 sb.Append($"INSERT INTO {_dbSetting.TableName} ");
                 sb.Append("(");
@@ -154,7 +154,7 @@ namespace Service.Database.Services
                 sb.Append(") ");
                 sb.Append("VALUES ");
                 sb.Append("(");
-                sb.Append($"'{data.DateTime}'");
+                sb.Append($"'{strDateTime}'");
                 sb.Append($", '{data.ParcelBarcode}'");
                 sb.Append($", '{data.ProductBarcode}'");
                 sb.Append($", '{data.ImagePath}'");
@@ -197,7 +197,7 @@ namespace Service.Database.Services
                 sb.Append(" AND DATE_TIME BETWEEN '" + start + "' AND '" + end + "' ");
 
                 DataTable dt = ExecuteSearch(sb.ToString());
-
+                
                 ExecuteCommandComplete?.Invoke(this, "Data Search Complete");
                 return dt;
             }
@@ -205,7 +205,6 @@ namespace Service.Database.Services
             {
                 throw err;
             }
-            
         }
 
         public ConnectionState CheckDBState()
@@ -304,6 +303,7 @@ namespace Service.Database.Services
                 return Convert.ToInt32(result);
             }
         }
+
         private void ExecuteNonQuery(string query)
         {
             using (SQLiteCommand cmd = new SQLiteCommand(query, _dbConnector))
@@ -311,6 +311,7 @@ namespace Service.Database.Services
                 cmd.ExecuteNonQuery();
             }
         }
+
         private DataTable ExecuteSearch(string query) 
         {
             using(SQLiteDataAdapter adapter = new SQLiteDataAdapter(query, _dbConnector))

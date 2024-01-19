@@ -49,6 +49,7 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -60,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\DisplayData.cs" />
     <Compile Include="Models\PostprocessingResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\IPostprocessingManager.cs" />
@@ -67,6 +69,10 @@
     <Compile Include="Services\Postprocessor.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Service.Camera\Service.Camera.csproj">
+      <Project>{17F19850-AC0F-4D11-ADA7-9809837BE78B}</Project>
+      <Name>Service.Camera</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Service.Drawing\Service.Drawing.csproj">
       <Project>{320d746d-2e95-4b08-a758-fdddaec98198}</Project>
       <Name>Service.Drawing</Name>

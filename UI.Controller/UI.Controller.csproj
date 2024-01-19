@@ -135,6 +135,10 @@
       <Project>{62D83649-AAC9-439C-8F78-6703782E8E65}</Project>
       <Name>Service.Preprocessing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Service.Save\Service.Save.csproj">
+      <Project>{EE54966B-7C33-4566-A65C-299A3C207B7B}</Project>
+      <Name>Service.Save</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Service.Setting\Service.Setting.csproj">
       <Project>{F2BDFF7C-F3BD-4AA8-9C93-8F118C6EA039}</Project>
       <Name>Service.Setting</Name>

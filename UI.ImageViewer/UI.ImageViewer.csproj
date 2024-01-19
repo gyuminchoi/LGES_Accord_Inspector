@@ -129,7 +129,7 @@
       <Name>Service.Pattern</Name>
     </ProjectReference>
     <ProjectReference Include="..\Service.Postprocessing\Service.Postprocessing.csproj">
-      <Project>{E02AED11-1AB5-4BC8-8E81-8D0923AA81AF}</Project>
+      <Project>{e02aed11-1ab5-4bc8-8e81-8d0923aa81af}</Project>
       <Name>Service.Postprocessing</Name>
     </ProjectReference>
     <ProjectReference Include="..\Service.VisionPro\Service.VisionPro.csproj">

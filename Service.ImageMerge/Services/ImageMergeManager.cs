@@ -98,8 +98,7 @@ namespace Services.ImageMerge.Services
                 {
                     for (int i = 0; i < TopMergeBitmapQueue.Count; i++)
                     {
-                        MergeBitmap mergeBmp;
-                        TopMergeBitmapQueue.TryDequeue(out mergeBmp);
+                        TopMergeBitmapQueue.TryDequeue(out MergeBitmap mergeBmp);
                         mergeBmp.Dispose();
                     }
                 }
@@ -108,8 +107,7 @@ namespace Services.ImageMerge.Services
                 {
                     for (int i = 0; i < BotMergeBitmapQueue.Count; i++)
                     {
-                        MergeBitmap mergeBmp;
-                        BotMergeBitmapQueue.TryDequeue(out mergeBmp);
+                        BotMergeBitmapQueue.TryDequeue(out MergeBitmap mergeBmp);
                         mergeBmp.Dispose();
                     }
                 }
@@ -145,7 +143,7 @@ namespace Services.ImageMerge.Services
                         bool flag = true;
                         foreach (var cam in _cameraManager.CameraDic)
                         {
-                            if (cam.Value.RawDatas.Count > 0)
+                            if (cam.Value.RawDatas.Count == 0)
                                 flag = false;
                         }
 
@@ -171,6 +169,7 @@ namespace Services.ImageMerge.Services
                         // Raw Data => InPtr => Bitmap 순으로 생성
                         MergeBitmap topMergeBmp = RawDataToMergeBitmap(topRawData, bmpData);
                         topMergeBmp.Bmp.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                        
                         TopMergeBitmapQueue.Enqueue(topMergeBmp);
 
                         // Bottom Raw Data 병합
@@ -180,10 +179,10 @@ namespace Services.ImageMerge.Services
                         // Raw Data => InPtr => Bitmap 순으로 생성
                         MergeBitmap botMergeBmp = RawDataToMergeBitmap(botRawData, bmpData);
                         botMergeBmp.Bmp.RotateFlip(RotateFlipType.Rotate90FlipNone);
+
                         BotMergeBitmapQueue.Enqueue(botMergeBmp);
 
                         Thread.Sleep(10);
-                        //TODO : 여기 까지 최적화 완료함. 비전프로 최적화, 검사 항목 추가, DB 저장 기능 추가 해야함
                     }
                     catch (Exception err)
                     {

@@ -1,4 +1,5 @@
-﻿using Service.Drawing.Services;
+﻿using Service.Camera.Services.ConvertService;
+using Service.Drawing.Services;
 using Service.Logger.Services;
 using Service.Postprocessing.Models;
 using Service.Setting.Models;
@@ -8,6 +9,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading;
+using System.Windows.Media.Imaging;
 
 namespace Service.Postprocessing.Services
 {
@@ -17,11 +19,15 @@ namespace Service.Postprocessing.Services
         private ConcurrentQueue<VisionProResult> _visionProResultQueue;
         private Thread _imageDrawThread = new Thread(() => { });
         private DrawingManager _drawingManager = new DrawingManager();
+        private BitmapConverter _bmpConvertor = new BitmapConverter();
         private VisionProRecipe _loadedRecipe;
         public bool IsRun { get; set; } = false;
 
         public delegate void PostprocessCompleteDelegate(PostprocessingResult result);
         public event PostprocessCompleteDelegate PostprocessComplete;
+
+        public delegate void DisplayUpdateDelegate(DisplayData displayData);
+        public event DisplayUpdateDelegate DisplayUpdateEvent;
 
         public Postprocessor(ConcurrentQueue<VisionProResult> vpResultQueue)
         {
@@ -38,8 +44,8 @@ namespace Service.Postprocessing.Services
             try
             {
                 IsRun = true;
-
-                _imageDrawThread = new Thread(new ThreadStart(ImageDrawProcess));
+                //TODO :Test
+                _imageDrawThread = new Thread(new ThreadStart(ImageDrawProcess2));
                 _imageDrawThread.Name = "VisionPro Inspection Thread";
                 _imageDrawThread.Start();
             }
@@ -71,33 +77,125 @@ namespace Service.Postprocessing.Services
 
         private void ImageDrawProcess()
         {
-            VisionProResult visionProResult = null;
-            //Tact 30ms
+            //Tact 40ms
             while (IsRun)
             {
-                if(!_visionProResultQueue.TryDequeue(out visionProResult))
+                VisionProResult vpResult = null;
+                if (!_visionProResultQueue.TryDequeue(out vpResult))
                 {
                     Thread.Sleep(10);
                     continue;
                 }
-                var result = new PostprocessingResult();
-                result.VisionProResult = visionProResult;
 
-                List<RectangleF> barcodeRectList = new List<RectangleF>();
-                List<RectangleF> boxRectList = new List<RectangleF>();
-                for (int i = 0; i < visionProResult.BoxDatas.Count; i++)
+                var ppResult = new PostprocessingResult(vpResult);
+
+                var boxRects = new List<RectangleF>();
+                var barcodeRects = new List<RectangleF>();
+                if (vpResult.BoxDatas.Count > 0) 
                 {
-                    CreateBoxRectangle(boxRectList, visionProResult.BoxDatas[i]);
-
-                    for (int j = 0; j < visionProResult.BoxDatas[i].Barcodes.Count; j++)
+                    for (int i = 0; i < vpResult.BoxDatas.Count; i++)
                     {
-                        CreateBarcodeRectangle(barcodeRectList, visionProResult.BoxDatas[i].Barcodes[j], _loadedRecipe);
+                        CreateBoxRectangle(boxRects, vpResult.BoxDatas[i]);
+
+                        if (vpResult.BoxDatas[i].Barcodes != null && vpResult.BoxDatas[i].Barcodes.Count > 0)
+                        {
+                            for (int j = 0; j < vpResult.BoxDatas[i].Barcodes.Count; j++)
+                            {
+                                CreateBarcodeRectangle(barcodeRects, vpResult.BoxDatas[i].Barcodes[j], _loadedRecipe);
+                            }
+                        }
                     }
                 }
-                Bitmap boxBmp = _drawingManager.DrawRectangles(visionProResult.OriginBmp.Clone() as Bitmap, _loadedRecipe.BoxColor, _loadedRecipe.PenSize, boxRectList);
-                result.OverlayBmp = _drawingManager.DrawRectangles(boxBmp, _loadedRecipe.BarcodeColor, _loadedRecipe.PenSize, barcodeRectList);
 
-                PostprocessComplete(result);
+                if (boxRects.Count > 0)
+                {
+                    Bitmap drawBmp = null;
+
+                    drawBmp = _drawingManager.DrawRectangles(vpResult.OriginBmp.Clone() as Bitmap, _loadedRecipe.BoxColor, _loadedRecipe.PenSize, boxRects);
+
+                    if (barcodeRects.Count > 0)
+                        ppResult.OverlayBmp = _drawingManager.DrawRectangles(drawBmp, _loadedRecipe.BarcodeColor, _loadedRecipe.PenSize, barcodeRects);
+                    else
+                        ppResult.OverlayBmp = drawBmp;
+                }
+                else
+                    ppResult.OverlayBmp = vpResult.OriginBmp.Clone() as Bitmap;
+                
+
+                // UI에 뿌려줄 데이터 생성
+                int boxCount = vpResult.BoxDatas.Count;
+                int barcodeCount = vpResult.GetBarcodeCount();
+
+                BitmapImage bmpImage = _bmpConvertor.BitmapToBitmapImage(ppResult.OverlayBmp);
+
+                DisplayData displayData = new DisplayData()
+                {
+                    BmpImage = bmpImage,
+                    BoxCount = boxCount,
+                    BarcodeCount = barcodeCount
+                };
+                DisplayUpdateEvent(displayData);
+
+                // SaveManager에 뿌려줌
+                if (vpResult.IsPass)
+                    PostprocessComplete(ppResult);
+                else
+                    ppResult.Dispose();
+
+                Thread.Sleep(10);
+            }
+        }
+        //TODO :test
+        private void ImageDrawProcess2()
+        {
+            //Tact 40ms
+            while (IsRun)
+            {
+                VisionProResult vpResult = null;
+                if (!_visionProResultQueue.TryDequeue(out vpResult))
+                {
+                    Thread.Sleep(10);
+                    continue;
+                }
+
+                var ppResult = new PostprocessingResult(vpResult);
+
+                var boxRects = new List<RectangleF>();
+                var barcodeRects = new List<RectangleF>();
+                if (vpResult.BoxDatas.Count > 0)
+                {
+                    for (int i = 0; i < vpResult.BoxDatas.Count; i++)
+                    {
+                        CreateBoxRectangle(boxRects, vpResult.BoxDatas[i]);
+                    }
+                }
+
+                if (boxRects.Count > 0)
+                    ppResult.OverlayBmp = _drawingManager.DrawRectangles(vpResult.OriginBmp.Clone() as Bitmap, _loadedRecipe.BoxColor, _loadedRecipe.PenSize, boxRects);
+                else
+                    ppResult.OverlayBmp = vpResult.OriginBmp.Clone() as Bitmap;
+
+
+                // UI에 뿌려줄 데이터 생성
+                int boxCount = vpResult.BoxDatas.Count;
+                int barcodeCount = 0;
+
+                BitmapImage bmpImage = _bmpConvertor.BitmapToBitmapImage(ppResult.OverlayBmp);
+
+                DisplayData displayData = new DisplayData()
+                {
+                    BmpImage = bmpImage,
+                    BoxCount = boxCount,
+                    BarcodeCount = barcodeCount
+                };
+                DisplayUpdateEvent(displayData);
+
+                // SaveManager에 뿌려줌
+                if (vpResult.IsPass)
+                    PostprocessComplete(ppResult);
+                else
+                    ppResult.Dispose();
+
                 Thread.Sleep(10);
             }
         }

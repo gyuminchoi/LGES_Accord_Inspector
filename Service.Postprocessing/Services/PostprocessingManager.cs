@@ -22,6 +22,7 @@ namespace Service.Postprocessing.Services
         public void Initialize(IVisionProManager vpm)
         {
             _vpManager = vpm;
+
             ProcessorDic.Add("Top", new Postprocessor(_vpManager.InspectorDic["Top"].VisionProResultQueue));
             ProcessorDic.Add("Bottom", new Postprocessor(_vpManager.InspectorDic["Bottom"].VisionProResultQueue));
         }

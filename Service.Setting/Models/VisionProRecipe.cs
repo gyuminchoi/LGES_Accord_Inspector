@@ -15,7 +15,7 @@ namespace Service.Setting.Models
         private int _barcodeHeight;
         private string _barcodeColor;
         private string _boxColor;
-        
+        private int _dateRange;
 
         public string PatMaxToolPath { get => _patMaxToolPath; set => SetProperty(ref _patMaxToolPath, value); }
         public string AffineToolPath { get => _affineToolPath; set => SetProperty(ref _affineToolPath, value); }
@@ -23,6 +23,7 @@ namespace Service.Setting.Models
         public int FrontBoxCount { get => _frontBoxCount; set => SetProperty(ref _frontBoxCount, value); }
         public int SideBoxCount { get => _sideBoxCount; set => SetProperty(ref _sideBoxCount, value); }
         public int BarcodeCount { get => _barcodeCount; set => SetProperty(ref _barcodeCount, value); }
+        public int DateRange { get => _dateRange; set => SetProperty(ref _dateRange, value); }
         public int PenSize { get => _penSize; set => SetProperty(ref _penSize, value); }
         public int BarcodeWidth { get => _barcodeWidth; set => SetProperty(ref _barcodeWidth, value); }
         public int BarcodeHeight { get => _barcodeHeight; set => SetProperty(ref _barcodeHeight, value); }
@@ -30,7 +31,7 @@ namespace Service.Setting.Models
         public string BoxColor { get => _boxColor; set => SetProperty(ref _boxColor, value); }
 
 
-        public VisionProRecipe(string patMaxPath, string affinePath, string idPath, int frontBoxCount, int sideBoxCount, int barcodeCount, int penSize, int barcodeWidth, int barcodeHeight, string barcodeColor, string boxColor)
+        public VisionProRecipe(string patMaxPath, string affinePath, string idPath, int frontBoxCount, int sideBoxCount, int barcodeCount,int dateRange, int penSize, int barcodeWidth, int barcodeHeight, string barcodeColor, string boxColor)
         {
             PatMaxToolPath = patMaxPath;
             AffineToolPath = affinePath;
@@ -38,6 +39,7 @@ namespace Service.Setting.Models
             FrontBoxCount = frontBoxCount;
             SideBoxCount = sideBoxCount;
             BarcodeCount = barcodeCount;
+            DateRange = dateRange;
             PenSize = penSize;
             BarcodeWidth = barcodeWidth;
             BarcodeHeight = barcodeHeight;

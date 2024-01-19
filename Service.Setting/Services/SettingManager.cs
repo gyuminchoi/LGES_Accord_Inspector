@@ -51,15 +51,15 @@ namespace Service.Setting.Services
             string boxColor = "Blue";
             Dictionary<string, VisionProRecipe> recipes = new Dictionary<string, VisionProRecipe>
             {
-                { "3x8", new VisionProRecipe(@"D:\Daewon", @"D:\Daewon", @"D:\Daewon", 12, 4, 2, 10, 400, 200, barcodeColor, boxColor) },
-                { "4x10", new VisionProRecipe(@"D:\Daewon", @"D:\Daewon", @"D:\Daewon", 20, 10, 2, 10, 400, 200, barcodeColor, boxColor) },
+                { "3x8", new VisionProRecipe(@"D:\Daewon", @"D:\Daewon", @"D:\Daewon", 12, 4, 2, 1, 10, 400, 200, barcodeColor, boxColor) },
+                { "4x10", new VisionProRecipe(@"D:\Daewon", @"D:\Daewon", @"D:\Daewon", 20, 10, 2, 1, 10, 400, 200, barcodeColor, boxColor) },
             };
 
             return new AppSetting()
             {
                 ImageSetting = new ImageSetting(
-                    isSaveOverlay: true,
-                    isSaveOriginal: true,
+                    isCompression: true,
+                    isSaveImage: true,
                     inspectionImageSavePath: @"D:\Daewon",
                     liveImageSavePath: @"D:\Daewon"),
 

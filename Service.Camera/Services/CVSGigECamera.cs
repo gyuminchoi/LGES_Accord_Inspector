@@ -83,13 +83,20 @@ namespace Service.Camera.Services
             }
 
             //TODO : TriggerMode Test
-            SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_USER_SET_SELECTOR, VirtualFG40Library.USER_SET_SELECTOR_DEFAULT);
+            SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_USER_SET_SELECTOR, VirtualFG40Library.USER_SET_SELECTOR_USER_SET_3);
             SetParameter(ECameraGetSetType.VFGCmd, VirtualFG40Library.MCAM_USER_SET_LOAD, null);
-            SetParameter(ECameraGetSetType.VFGInt, VirtualFG40Library.GEV_SCPS_PACKETSIZE, 8192);
-            SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_TRIGGER_MODE, VirtualFG40Library.TRIGGER_MODE_ON);
-            SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_TRIGGER_SOURCE, VirtualFG40Library.TRIGGER_SOURCE_SOFTWARE);
-            SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_PIXEL_FORMAT, VirtualFG40Library.PIXEL_FORMAT_MONO8);
-
+            //SetParameter(ECameraGetSetType.VFGInt, VirtualFG40Library.GEV_SCPS_PACKETSIZE, 8192);
+            //SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_TRIGGER_MODE, VirtualFG40Library.TRIGGER_MODE_ON);
+            //SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_TRIGGER_SOURCE, VirtualFG40Library.TRIGGER_SOURCE_SOFTWARE);
+            //SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_PIXEL_FORMAT, VirtualFG40Library.PIXEL_FORMAT_MONO8);
+            //SetParameter(ECameraGetSetType.VFGInt, VirtualFG40Library.MCAM_OFFSET_X, 0);
+            //SetParameter(ECameraGetSetType.VFGInt, VirtualFG40Library.MCAM_OFFSET_Y, 0);
+            //int width = 0;
+            //_vfg.GetIntReg(CamConfig.HDevice, VirtualFG40Library.MCAM_WIDTH_MAX, ref width);
+            //SetParameter(ECameraGetSetType.VFGInt, VirtualFG40Library.MCAM_WIDTH, width);
+            //int height = 0;
+            //_vfg.GetIntReg(CamConfig.HDevice, VirtualFG40Library.MCAM_HEIGHT_MAX, ref height);
+            //SetParameter(ECameraGetSetType.VFGInt, VirtualFG40Library.MCAM_HEIGHT, height);
             CamConfig.CamState = ECameraState.Opened;
             CamConfig.IsOpen = true;
         }
@@ -107,7 +114,6 @@ namespace Service.Camera.Services
             _vfg?.CloseDevice(CamConfig.HDevice);
         }
 
-        // TODO : Test
         public ulong GetPacketLossCount()
         {
             ulong total = 0;
@@ -284,7 +290,7 @@ namespace Service.Camera.Services
                         if (errCode != VirtualFG40Library.MCAM_ERR_SUCCESS)
                             errCount++;
 
-                        Thread.Sleep(400);
+                        Thread.Sleep(3000);
                     }
                     catch (Exception err)
                     {

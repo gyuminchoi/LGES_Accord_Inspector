@@ -110,6 +110,10 @@
       <Project>{0C853BAC-42CD-43AF-9EF3-2E34A1D2A33F}</Project>
       <Name>Service.CustomException</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Service.Database\Service.Database.csproj">
+      <Project>{CE51A3AD-9CE7-4F82-9A32-59575BC61038}</Project>
+      <Name>Service.Database</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Service.ImageMerge\Service.ImageMerge.csproj">
       <Project>{72b5b909-5d50-4aeb-9eb5-afe6720837c0}</Project>
       <Name>Service.ImageMerge</Name>

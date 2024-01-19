@@ -13,6 +13,7 @@ using Service.Database.Services;
 using Service.IO.Services;
 using Service.Logger.Services;
 using Service.Postprocessing.Services;
+using Service.Save.Services;
 using Service.Setting.Services;
 using Service.VisionPro.Services;
 using Services.ImageMerge.Services;
@@ -47,6 +48,7 @@ namespace BarcodeLabel.Main.Services.Bootstrappers
             containerRegistry.RegisterSingleton<IPostprocessingManager, PostprocessingManager>();
             containerRegistry.RegisterSingleton<IConnectionCheckManager, ConnectionCheckManager>();
             containerRegistry.RegisterSingleton<ISQLiteManager,SQLiteManager>();
+            containerRegistry.RegisterSingleton<ISaveManager, SaveManager>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
@@ -76,6 +78,30 @@ namespace BarcodeLabel.Main.Services.Bootstrappers
             settingManager.Load();
             _logWrite.Info("Initialize Setting Manager Complete!");
 
+            ISQLiteManager sqliteManager = Container.Resolve<ISQLiteManager>();
+            sqliteManager.Initialize(settingManager);
+            _logWrite.Info("Initialize SQLite Manager Complete!");
+            //Thread testThread = new Thread(() =>
+            //{
+            //    long i = 0;
+            //    long j = 0;
+            //    while (true)
+            //    {
+            //        RecordData data = new RecordData()
+            //        {
+            //            DateTime = DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss"),
+            //            ParcelBarcode = i.ToString(),
+            //            ProductBarcode = j.ToString(),
+            //            ImagePath = @"C:\Users\TSgyuminChoi\Desktop\대원제약 검토 자료\1101\Test2\Bot Result\1.bmp"
+            //        };
+            //        sqliteManager.InsertData(data);
+            //        i++;
+            //        j++;
+            //        Thread.Sleep(200);
+            //    }
+            //});
+            //testThread.Start();
+
             ICameraManager camManager = Container.Resolve<ICameraManager>();
             camManager.Opens();
             _logWrite.Info("Initialize Camera Manager Complete!");
@@ -92,16 +118,12 @@ namespace BarcodeLabel.Main.Services.Bootstrappers
             _logWrite.Info("Initialize Preprocessing Manager Complete!");
 
             IVisionProManager vpManager = Container.Resolve<IVisionProManager>();
-            vpManager.Initialize(imManager);
+            vpManager.Initialize(imManager, sqliteManager);
             _logWrite.Info("Initialize VisionPro Manager Complete!");
 
-            IPostprocessingManager postprocessingManager = Container.Resolve<IPostprocessingManager>();
-            postprocessingManager.Initialize(vpManager);
+            IPostprocessingManager ppManager = Container.Resolve<IPostprocessingManager>();
+            ppManager.Initialize(vpManager);
             _logWrite.Info("Initialize Postprocessing Manager Complete!");
-
-            ISQLiteManager sqliteManager = Container.Resolve<ISQLiteManager>();
-            sqliteManager.Initialize(settingManager);
-            _logWrite.Info("Initialize SQLite Manager Complete!");
 
             IConnectionCheckManager ccManager = Container.Resolve<IConnectionCheckManager>();
             ccManager.Initialize(camManager, vpManager, sqliteManager);
@@ -109,6 +131,10 @@ namespace BarcodeLabel.Main.Services.Bootstrappers
 
             IEventAggregator eventAggregator = Container.Resolve<IEventAggregator>();
             eventAggregator.GetEvent<ServicesInitCompleteEvent>().Publish();
+
+            ISaveManager saveManager = Container.Resolve<ISaveManager>();
+            saveManager.Initialize(settingManager, ppManager, sqliteManager);
+            _logWrite.Info("Initialize Save Manager Complete!");
             sc.Close(TimeSpan.Zero);
         }
 

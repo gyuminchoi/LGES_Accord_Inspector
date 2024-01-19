@@ -5,6 +5,7 @@ using Service.Camera.Services.ConvertService;
 using Service.Logger.Services;
 using Service.Postprocessing.Models;
 using Service.Postprocessing.Services;
+using System;
 using System.Windows.Media.Imaging;
 
 namespace UI.ImageViewer.ViewModels
@@ -19,10 +20,11 @@ namespace UI.ImageViewer.ViewModels
         private int _bottomBarcodeCount = 0;
         private BitmapImage _bottomOverlayImg;
         private IEventAggregator _eventAggregator;
-        private IPostprocessingManager _postprocessing;
-        private BitmapConverter _bmpConverter = BitmapConverter.Instance;
+        private IPostprocessingManager _ppManager;
         private ServicesInitCompleteEvent _servicesInitCompleteEvent;
         private LogWrite _logWrite = LogWrite.Instance;
+        private int _topCount = 0;
+        private int _botCount = 0;
         #endregion
 
         #region 프로퍼티
@@ -32,67 +34,43 @@ namespace UI.ImageViewer.ViewModels
         public int BottomBoxCount { get => _bottomBoxCount; set => SetProperty(ref _bottomBoxCount, value); }
         public int BottomBarcodeCount { get => _bottomBarcodeCount; set => SetProperty(ref _bottomBarcodeCount, value); }
         public BitmapImage BottomOverlayImg { get => _bottomOverlayImg; set => SetProperty(ref _bottomOverlayImg, value); }
+        public int TopCount { get => _topCount; set => SetProperty(ref _topCount, value); }
+        public int BotCount { get => _botCount; set => SetProperty(ref _botCount, value); }
         #endregion
 
         #region 생성자
-        public ImageViewerViewModel(IEventAggregator ea, IPostprocessingManager postprocessingManager)
+        public ImageViewerViewModel(IEventAggregator ea, IPostprocessingManager ppm)
         {
             _eventAggregator = ea;
-            _postprocessing = postprocessingManager;
+            _ppManager = ppm;
 
             _servicesInitCompleteEvent = _eventAggregator.GetEvent<ServicesInitCompleteEvent>();
             _servicesInitCompleteEvent.Subscribe(OnSubscribeEvent);
         }
-
 
         #endregion
 
         #region 메서드
         private void OnSubscribeEvent()
         {
-            _postprocessing.ProcessorDic["Top"].PostprocessComplete += OnTopImageUpdate;
-            _postprocessing.ProcessorDic["Bottom"].PostprocessComplete += OnBottomImageUpdate;
+            _ppManager.ProcessorDic["Top"].DisplayUpdateEvent += OnTopUIUpdate;
+            _ppManager.ProcessorDic["Bottom"].DisplayUpdateEvent += OnBottomUIUpdate;
         }
 
-        private void OnTopImageUpdate(PostprocessingResult result)
+        private void OnTopUIUpdate(DisplayData displayData)
         {
-            TopBarcodeCount = 0;
-
-            TopBoxCount = result.VisionProResult.BoxDatas.Count;
-            foreach (var box in result.VisionProResult.BoxDatas)
-            {
-                TopBarcodeCount += box.Barcodes.Count;
-            }
-
-            TopOverlayImg = _bmpConverter.BitmapToBitmapImage(result.OverlayBmp);
-            result.Dispose();
-            //result.OverlayBmp.Save($@"D:\Daewon\TestImage\{_count}.bmp", ImageFormat.Bmp);
-            //lock (_testLock)
-            //{
-            //    _count++;
-            //}
+            TopOverlayImg = displayData.BmpImage;
+            TopBoxCount = displayData.BoxCount;
+            TopBarcodeCount = displayData.BarcodeCount;
+            TopCount++;
         }
-        private void OnBottomImageUpdate(PostprocessingResult result)
+        private void OnBottomUIUpdate(DisplayData displayData)
         {
-            BottomBarcodeCount = 0;
-
-            BottomBoxCount = result.VisionProResult.BoxDatas.Count;
-            foreach (var box in result.VisionProResult.BoxDatas)
-            {
-                BottomBarcodeCount += box.Barcodes.Count;
-            }
-
-            BottomOverlayImg = _bmpConverter.BitmapToBitmapImage(result.OverlayBmp);
-
-            result.Dispose();
-            //result.OverlayBmp.Save($@"D:\Daewon\TestImage\{_count}.bmp",ImageFormat.Bmp);
-            //lock (_testLock)
-            //{
-            //    _count++;
-            //}
+            BottomOverlayImg = displayData.BmpImage;
+            BottomBoxCount = displayData.BoxCount;
+            BottomBarcodeCount = displayData.BarcodeCount;
+            BotCount++;
         }
-
-
         #endregion
     }
 }

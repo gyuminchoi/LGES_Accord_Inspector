@@ -5,6 +5,7 @@ using Prism.Mvvm;
 using Service.Camera.Models;
 using Service.ImageMerge.Models;
 using Service.Postprocessing.Services;
+using Service.Save.Services;
 using Service.Setting.Models;
 using Service.Setting.Services;
 using Service.VisionPro.Services;
@@ -25,8 +26,9 @@ namespace UI.Controller.ViewModels
         private IEventAggregator _eventAggregator;
         private ISettingManager _settingManager;
         private IVisionProManager _visionProManager;
-        private IImageMergeManager _imManager;
-        private IPostprocessingManager _postprocessingManager;
+        private IImageMergeManager _imageMergeManager;
+        private IPostprocessingManager _postProcessingManager;
+        private ISaveManager _saveManager;
         private EInspectionState _inspectionState = EInspectionState.Stopped;
         private InspectionStatusChangeEvent _inspectionStatusChangeEvent;
         private VisionProSetting _visionProSetting;
@@ -57,23 +59,23 @@ namespace UI.Controller.ViewModels
                 while (true)
                 {
                     Bitmap bmp1 = new Bitmap(@"C:\Users\TSgyuminChoi\Desktop\대원제약 검토 자료\1101\Test2\Bot Result\1.bmp");
-                    _imManager.TopMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp1.Clone() as Bitmap});
-                    _imManager.BotMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp1.Clone() as Bitmap });
+                    _imageMergeManager.TopMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp1.Clone() as Bitmap});
+                    _imageMergeManager.BotMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp1.Clone() as Bitmap });
                     bmp1.Dispose();
                     Thread.Sleep(300);
                     Bitmap bmp2 = new Bitmap(@"C:\Users\TSgyuminChoi\Desktop\대원제약 검토 자료\1101\Test2\Bot Result\12.bmp");
-                    _imManager.TopMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp2.Clone() as Bitmap });
-                    _imManager.BotMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp2.Clone() as Bitmap });
+                    _imageMergeManager.TopMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp2.Clone() as Bitmap });
+                    _imageMergeManager.BotMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp2.Clone() as Bitmap });
                     bmp2.Dispose();
                     Thread.Sleep(300);
                     Bitmap bmp3 = new Bitmap(@"C:\Users\TSgyuminChoi\Desktop\대원제약 검토 자료\1101\Test2\Bot Result\2.bmp");
-                    _imManager.TopMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp3.Clone() as Bitmap });
-                    _imManager.BotMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp3.Clone() as Bitmap });
+                    _imageMergeManager.TopMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp3.Clone() as Bitmap });
+                    _imageMergeManager.BotMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp3.Clone() as Bitmap });
                     bmp3.Dispose();
                     Thread.Sleep(300);
                     Bitmap bmp4 = new Bitmap(@"C:\Users\TSgyuminChoi\Desktop\대원제약 검토 자료\1101\Test2\Bot Result\3.bmp");
-                    _imManager.TopMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp4.Clone() as Bitmap });
-                    _imManager.BotMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp4.Clone() as Bitmap });
+                    _imageMergeManager.TopMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp4.Clone() as Bitmap });
+                    _imageMergeManager.BotMergeBitmapQueue.Enqueue(new MergeBitmap() { Bmp = bmp4.Clone() as Bitmap });
                     bmp4.Dispose();
                     Thread.Sleep(300);
                 }
@@ -81,14 +83,15 @@ namespace UI.Controller.ViewModels
             _testThread.Start();
         }
 
-        public ControllerViewModel(ICameraManager cm, IEventAggregator ea, ISettingManager sm, IVisionProManager vm, IImageMergeManager imManager, IPostprocessingManager postprocessingManager)
+        public ControllerViewModel(ICameraManager cm, IEventAggregator ea, ISettingManager sm, IVisionProManager vm, IImageMergeManager imm, IPostprocessingManager ppm, ISaveManager saveManager)
         {
             _camManager = cm;
             _eventAggregator = ea;
             _settingManager = sm;
             _visionProManager = vm;
-            _imManager = imManager;
-            _postprocessingManager = postprocessingManager;
+            _imageMergeManager = imm;
+            _postProcessingManager = ppm;
+            _saveManager = saveManager;
 
             _inspectionStatusChangeEvent = _eventAggregator.GetEvent<InspectionStatusChangeEvent>();
             _inspectionStatusChangeEvent.Subscribe(OnChangeIsEnable);
@@ -130,34 +133,52 @@ namespace UI.Controller.ViewModels
                 case EInspectionState.Stopped:
                     _eventAggregator.GetEvent<InspectionStatusChangeEvent>().Publish(true);
 
-                    _imManager.Start();
+                    _saveManager.Start();
+
+                    _postProcessingManager.Load(Recipe);
+                    _postProcessingManager.Start();
 
                     _visionProManager.RecipeLoad(Recipe);
                     _visionProManager.Run();
 
-                    _postprocessingManager.Load(Recipe);
-                    _postprocessingManager.Start();
+                    _imageMergeManager.Start();
+
+                    _camManager.AcqStarts();
+                    _camManager.GrabStarts();
+
+                    foreach (var item in _camManager.CameraDic.Values)
+                    {
+                        item.ContinueSWTrigExecute();
+                    }
+
                     InspectionState = EInspectionState.Running;
                     return;
 
                 case EInspectionState.Running:
                     _eventAggregator.GetEvent<InspectionStatusChangeEvent>().Publish(false);
 
-                    _postprocessingManager.Stop();
+                    foreach (var item in _camManager.CameraDic.Values)
+                    {
+                        item.StopContinueTrigExecute();
+                    }
+
+                    _camManager.GrabStarts();
+                    _camManager.AcqStarts();
+
+                    _imageMergeManager.Stop();
+
                     _visionProManager.Stop();
-                    _imManager.Stop();
-                    
 
+                    _postProcessingManager.Stop();
 
-                    _testThread.Abort();
+                    _saveManager.Stop();
 
+                    //_testThread.Abort();
 
                     InspectionState = EInspectionState.Stopped;
                     return;
-                
             }
-            //_camManager.AcqStarts();
-            //_camManager.GrabStarts();
+            
 
             //_eventAggregator.GetEvent<StartStopCompleteEvent>().Publish("Start");
             //Thread cam1ExecuteThread = new Thread(() => 

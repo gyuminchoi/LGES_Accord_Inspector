@@ -1,4 +1,5 @@
-﻿using Service.Setting.Models;
+﻿using Service.Database.Services;
+using Service.Setting.Models;
 using Services.ImageMerge.Services;
 using System.Collections.Generic;
 
@@ -8,14 +9,16 @@ namespace Service.VisionPro.Services
     {
         
         private IImageMergeManager _imManager;
+        private ISQLiteManager _sqliteManager;
         public Dictionary<string, VisionProInspector> InspectorDic { get; set; } = new Dictionary<string, VisionProInspector>();
         public VisionProManager() { }
 
-        public void Initialize(IImageMergeManager imManager)
+        public void Initialize(IImageMergeManager imManager, ISQLiteManager sqliteManager)
         {
             _imManager = imManager;
-            InspectorDic.Add("Top", new VisionProInspector(_imManager.TopMergeBitmapQueue));
-            InspectorDic.Add("Bottom", new VisionProInspector(_imManager.BotMergeBitmapQueue));
+            _sqliteManager = sqliteManager;
+            InspectorDic.Add("Top", new VisionProInspector(_imManager.TopMergeBitmapQueue, sqliteManager));
+            InspectorDic.Add("Bottom", new VisionProInspector(_imManager.BotMergeBitmapQueue, sqliteManager));
         }
 
         public void RecipeLoad(VisionProRecipe recipe)

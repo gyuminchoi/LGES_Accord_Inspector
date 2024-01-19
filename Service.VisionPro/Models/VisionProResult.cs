@@ -10,6 +10,7 @@ namespace Service.VisionPro.Models
 {
     public class VisionProResult : IDisposable
     {
+        public DateTime InspectionTime { get; set; }
         public Bitmap OriginBmp { get; set; }
         public List<Box> BoxDatas { get; set; }
         public bool IsPass { get; set; }
@@ -23,9 +24,23 @@ namespace Service.VisionPro.Models
                 
         }
 
+        public int GetBarcodeCount()
+        {
+            int count = 0;
+            
+            foreach (Box box in BoxDatas)
+            {
+                if(box.Barcodes != null)
+                    count += box.Barcodes.Count;
+            }
+
+            return count;
+        }
+
         public void Dispose()
         {
-            OriginBmp.Dispose();
+            if (OriginBmp != null) { OriginBmp.Dispose(); }
+            foreach (Box box in BoxDatas) {  box.Dispose(); }
         }
     }
 }
