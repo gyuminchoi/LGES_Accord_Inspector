@@ -7,6 +7,7 @@ using Service.VisionPro.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Media.Imaging;
@@ -86,7 +87,8 @@ namespace Service.Postprocessing.Services
                     Thread.Sleep(10);
                     continue;
                 }
-
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
                 var ppResult = new PostprocessingResult(vpResult);
 
                 var boxRects = new List<RectangleF>();
@@ -142,6 +144,8 @@ namespace Service.Postprocessing.Services
                 else
                     ppResult.Dispose();
 
+                sw.Stop();
+                _logWrite.Info("PostProcessor : " + sw.ElapsedMilliseconds.ToString() + Environment.NewLine + "Queue Count : " + _visionProResultQueue.Count);
                 Thread.Sleep(10);
             }
         }
@@ -181,7 +185,6 @@ namespace Service.Postprocessing.Services
                 int barcodeCount = 0;
 
                 BitmapImage bmpImage = _bmpConvertor.BitmapToBitmapImage(ppResult.OverlayBmp);
-
                 DisplayData displayData = new DisplayData()
                 {
                     BmpImage = bmpImage,

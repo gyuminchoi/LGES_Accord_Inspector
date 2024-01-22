@@ -7,6 +7,7 @@ using Service.Setting.Models;
 using Service.Setting.Services;
 using Service.VisionPro.Models;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -23,7 +24,8 @@ namespace Service.Save.Services
         private ISQLiteManager _sqliteManager;
         private int _testCount1 = 0;
         private int _testCount2 = 0;
-
+        private object _testLock1 = new object();
+        private object _testLock2 = new object();
         public SaveManager() { }
 
         public void Initialize(ISettingManager settingManager, IPostprocessingManager ppManager, ISQLiteManager sqliteManager)
@@ -79,10 +81,14 @@ namespace Service.Save.Services
         //TODO : Test
         private void OnSaveInspectData2(PostprocessingResult result)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             string settingPath = _settingManager.AppSetting.ImageSetting.InspectionImageSavePath;
             string directory = SetDirectory(settingPath, result.VisionProResult.InspectionTime);
-
+            Directory.CreateDirectory(directory);
             Save2(result, directory, _settingManager.AppSetting.ImageSetting);
+            sw.Stop();
+            _logWrite.Info("Save : " + sw.ElapsedMilliseconds.ToString());
         }
 
         private string SetDirectory(string rootDirectory, DateTime dt)
@@ -126,9 +132,14 @@ namespace Service.Save.Services
                 else
                     boxData.CropBmp.Save(filePath, ImageFormat.Bmp);
 
-                // Insert DB Table 
-                string parcelCode = _testCount1.ToString();
-                string productCode = _testCount2.ToString();
+                // Insert DB Table
+                string parcelCode;
+                string productCode;
+                lock (_testLock1)
+                {
+                    parcelCode = _testCount1.ToString();
+                    productCode = _testCount2.ToString();
+                }
 
                 _sqliteManager.InsertData(new RecordData(ppResult.VisionProResult.InspectionTime, parcelCode, productCode, filePath));
             }
@@ -138,18 +149,25 @@ namespace Service.Save.Services
         //TODO :test
         private string SetFilePath2(Box boxData, ImageSetting setting, string directoryPath)
         {
-            string parcelCode = _testCount1.ToString();
-            string productCode = _testCount2.ToString();
+            string parcelCode;
+            string productCode;
+            lock (_testLock1)
+            {
+                parcelCode = _testCount1.ToString();
+                productCode = _testCount2.ToString();
+            }
 
             string extension = null;
-            if (setting.IsCompression.Value) extension = ".jpg";
-            else extension = ".bmp";
+            if (setting.IsCompression.Value) extension = "jpg";
+            else extension = "bmp";
 
             string fileName = $"{parcelCode}_{productCode}.{extension}";
             string filePath = Path.Combine(directoryPath, fileName);
-
-            _testCount1++;
-            _testCount2++;
+            lock (_testLock1)
+            {
+                _testCount1++;
+                _testCount2++;
+            }
             return filePath;
         }
 

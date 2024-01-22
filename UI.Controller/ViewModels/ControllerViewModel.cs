@@ -146,10 +146,10 @@ namespace UI.Controller.ViewModels
                     _camManager.AcqStarts();
                     _camManager.GrabStarts();
 
-                    foreach (var item in _camManager.CameraDic.Values)
-                    {
-                        item.ContinueSWTrigExecute();
-                    }
+                    //foreach (var item in _camManager.CameraDic.Values)
+                    //{
+                    //    item.ContinueSWTrigExecute();
+                    //}
 
                     InspectionState = EInspectionState.Running;
                     return;
@@ -157,10 +157,10 @@ namespace UI.Controller.ViewModels
                 case EInspectionState.Running:
                     _eventAggregator.GetEvent<InspectionStatusChangeEvent>().Publish(false);
 
-                    foreach (var item in _camManager.CameraDic.Values)
-                    {
-                        item.StopContinueTrigExecute();
-                    }
+                    //foreach (var item in _camManager.CameraDic.Values)
+                    //{
+                    //    item.StopContinueTrigExecute();
+                    //}
 
                     _camManager.GrabStarts();
                     _camManager.AcqStarts();

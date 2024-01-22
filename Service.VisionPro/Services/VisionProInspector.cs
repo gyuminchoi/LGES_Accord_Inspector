@@ -13,6 +13,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -234,6 +235,7 @@ namespace Service.VisionPro.Services
             }
         }
         //TODO : Test
+        //165ms
         private void InspectionProcess2()
         {
             int errCount = 0;
@@ -249,7 +251,8 @@ namespace Service.VisionPro.Services
                             Thread.Sleep(10);
                             continue;
                         }
-
+                        Stopwatch sw = new Stopwatch();
+                        sw.Start();
                         var vpResult = new VisionProResult(new List<Box>());
 
                         using (var cogBmp = new CogImage8Grey(mergeBmp.Bmp))
@@ -279,7 +282,8 @@ namespace Service.VisionPro.Services
                             vpResult.OriginBmp = cogBmp.ToBitmap();
 
                             VisionProResultQueue.Enqueue(vpResult);
-
+                            sw.Stop();
+                            _logWrite.Info("VisionPro : " + sw.ElapsedMilliseconds.ToString() + Environment.NewLine + "Queue Count : " + _mergeBmpQueue.Count);
                             mergeBmp.Dispose();
                         }
                         errCount = 0;

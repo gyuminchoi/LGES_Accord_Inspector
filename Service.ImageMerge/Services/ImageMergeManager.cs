@@ -5,6 +5,7 @@ using Service.Logger.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Dynamic;
@@ -128,7 +129,7 @@ namespace Services.ImageMerge.Services
             {
             }
         }
-
+        //300ms
         private void ImageMergeProcess()
         {
             try
@@ -152,7 +153,8 @@ namespace Services.ImageMerge.Services
                             Thread.Sleep(10);
                             continue;
                         }
-
+                        Stopwatch sw = new Stopwatch();
+                        sw.Start();
                         foreach (var keyVal in _cameraManager.CameraDic)
                         {
                             byte[] rawData = null;
@@ -165,10 +167,9 @@ namespace Services.ImageMerge.Services
                         // Top Raw Data 병합
                         byte[] topRawData = new byte[standardCam.CamConfig.Buffersize * 2];
                         MergeRawData(topRawData, _rawDataDic["Cam2"], _rawDataDic["Cam1"]);
-
                         // Raw Data => InPtr => Bitmap 순으로 생성
                         MergeBitmap topMergeBmp = RawDataToMergeBitmap(topRawData, bmpData);
-                        topMergeBmp.Bmp.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                        //topMergeBmp.Bmp.RotateFlip(RotateFlipType.Rotate90FlipNone);
                         
                         TopMergeBitmapQueue.Enqueue(topMergeBmp);
 
@@ -178,10 +179,11 @@ namespace Services.ImageMerge.Services
 
                         // Raw Data => InPtr => Bitmap 순으로 생성
                         MergeBitmap botMergeBmp = RawDataToMergeBitmap(botRawData, bmpData);
-                        botMergeBmp.Bmp.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                        //botMergeBmp.Bmp.RotateFlip(RotateFlipType.Rotate90FlipNone);
 
                         BotMergeBitmapQueue.Enqueue(botMergeBmp);
-
+                        sw.Stop();
+                        _logWrite.Info("ImageMerge : " + sw.ElapsedMilliseconds.ToString());
                         Thread.Sleep(10);
                     }
                     catch (Exception err)

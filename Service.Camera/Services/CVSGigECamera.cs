@@ -1,4 +1,4 @@
-﻿using Crevis.VirtualFG40Library;
+﻿  using Crevis.VirtualFG40Library;
 using Service.Camera.Models;
 using Service.Camera.Services.ConvertService;
 using Service.CustomException.Models.ErrorTypes;
@@ -488,7 +488,7 @@ namespace Service.Camera.Services
                 // 다른 이벤트라면 종료
                 if (nEventID != VirtualFG40Library.EVENT_NEW_IMAGE)
                     return 0;
-
+                
                 // Grab중이 아니라면 종료
                 if (!CamConfig.IsGrabStart)
                     return 0;
