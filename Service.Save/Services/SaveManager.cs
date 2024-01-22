@@ -22,10 +22,6 @@ namespace Service.Save.Services
         private ISettingManager _settingManager;
         private IPostprocessingManager _ppManager;
         private ISQLiteManager _sqliteManager;
-        private int _testCount1 = 0;
-        private int _testCount2 = 0;
-        private object _testLock1 = new object();
-        private object _testLock2 = new object();
         public SaveManager() { }
 
         public void Initialize(ISettingManager settingManager, IPostprocessingManager ppManager, ISQLiteManager sqliteManager)
@@ -122,52 +118,43 @@ namespace Service.Save.Services
         //TODO : Test
         private void Save2(PostprocessingResult ppResult, string path, ImageSetting setting)
         {
-            foreach (var boxData in ppResult.VisionProResult.BoxDatas)
+            try
             {
-                string filePath = SetFilePath2(boxData, setting, path);
-
-                // Image Save
-                if (setting.IsCompression.Value)
-                    ImageSaveAsJpg(filePath, boxData.CropBmp, 80L);
-                else
-                    boxData.CropBmp.Save(filePath, ImageFormat.Bmp);
-
-                // Insert DB Table
-                string parcelCode;
-                string productCode;
-                lock (_testLock1)
+                int parcel = 0;
+                int product = 0;
+                foreach (var boxData in ppResult.VisionProResult.BoxDatas)
                 {
-                    parcelCode = _testCount1.ToString();
-                    productCode = _testCount2.ToString();
+                    string filePath = SetFilePath2(boxData, setting, path, parcel.ToString(), product.ToString());
+
+                    // Image Save
+                    if (setting.IsCompression.Value)
+                        ImageSaveAsJpg(filePath, boxData.CropBmp, 80L);
+                    else
+                        boxData.CropBmp.Save(filePath, ImageFormat.Bmp);
+
+                    // Insert DB Table
+                    _sqliteManager.InsertData(new RecordData(ppResult.VisionProResult.InspectionTime, parcel.ToString(), product.ToString(), filePath));
+                    parcel++;
+                    product++;
                 }
 
-                _sqliteManager.InsertData(new RecordData(ppResult.VisionProResult.InspectionTime, parcelCode, productCode, filePath));
+                ppResult.Dispose();
             }
-
-            ppResult.Dispose();
+            catch (Exception err)
+            {
+                _logWrite.Error(err,false,true);
+            }
+            
         }
         //TODO :test
-        private string SetFilePath2(Box boxData, ImageSetting setting, string directoryPath)
+        private string SetFilePath2(Box boxData, ImageSetting setting, string directoryPath,string parcel,string product)
         {
-            string parcelCode;
-            string productCode;
-            lock (_testLock1)
-            {
-                parcelCode = _testCount1.ToString();
-                productCode = _testCount2.ToString();
-            }
-
             string extension = null;
             if (setting.IsCompression.Value) extension = "jpg";
             else extension = "bmp";
 
-            string fileName = $"{parcelCode}_{productCode}.{extension}";
+            string fileName = $"{parcel}_{product}.{extension}";
             string filePath = Path.Combine(directoryPath, fileName);
-            lock (_testLock1)
-            {
-                _testCount1++;
-                _testCount2++;
-            }
             return filePath;
         }
 
