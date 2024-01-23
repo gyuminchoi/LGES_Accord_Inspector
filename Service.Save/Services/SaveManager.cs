@@ -12,6 +12,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Encoder = System.Drawing.Imaging.Encoder;
 
 namespace Service.Save.Services
@@ -71,18 +72,25 @@ namespace Service.Save.Services
         {
             string settingPath = _settingManager.AppSetting.ImageSetting.InspectionImageSavePath;
             string directory = SetDirectory(settingPath, result.VisionProResult.InspectionTime);
-
+            Directory.CreateDirectory(directory);
             Save(result, directory, _settingManager.AppSetting.ImageSetting);
         }
+
         //TODO : Test
         private void OnSaveInspectData2(PostprocessingResult result)
         {
+            ThreadPool.QueueUserWorkItem(ImageSaveProcess, result);
+        }
+
+        private void ImageSaveProcess(object result)
+        {
+            PostprocessingResult ppResult = (PostprocessingResult)result;
             Stopwatch sw = new Stopwatch();
             sw.Start();
             string settingPath = _settingManager.AppSetting.ImageSetting.InspectionImageSavePath;
-            string directory = SetDirectory(settingPath, result.VisionProResult.InspectionTime);
+            string directory = SetDirectory(settingPath, ppResult.VisionProResult.InspectionTime);
             Directory.CreateDirectory(directory);
-            Save2(result, directory, _settingManager.AppSetting.ImageSetting);
+            Save2(ppResult, directory, _settingManager.AppSetting.ImageSetting);
             sw.Stop();
             _logWrite.Info("Save : " + sw.ElapsedMilliseconds.ToString());
         }
@@ -115,16 +123,18 @@ namespace Service.Save.Services
 
             ppResult.Dispose();
         }
+
         //TODO : Test
         private void Save2(PostprocessingResult ppResult, string path, ImageSetting setting)
         {
+            string filePath;
             try
             {
                 int parcel = 0;
                 int product = 0;
                 foreach (var boxData in ppResult.VisionProResult.BoxDatas)
                 {
-                    string filePath = SetFilePath2(boxData, setting, path, parcel.ToString(), product.ToString());
+                    filePath = SetFilePath2(boxData, setting, path, parcel.ToString(), product.ToString());
 
                     // Image Save
                     if (setting.IsCompression.Value)
@@ -143,6 +153,7 @@ namespace Service.Save.Services
             catch (Exception err)
             {
                 _logWrite.Error(err,false,true);
+                _logWrite.Info(filePath, false, false);
             }
             
         }
@@ -150,10 +161,10 @@ namespace Service.Save.Services
         private string SetFilePath2(Box boxData, ImageSetting setting, string directoryPath,string parcel,string product)
         {
             string extension = null;
-            if (setting.IsCompression.Value) extension = "jpg";
-            else extension = "bmp";
+            if (setting.IsCompression.Value) extension = ".jpg";
+            else extension = ".bmp";
 
-            string fileName = $"{parcel}_{product}.{extension}";
+            string fileName = $"{parcel}_{product}{extension}";
             string filePath = Path.Combine(directoryPath, fileName);
             return filePath;
         }
@@ -167,7 +178,7 @@ namespace Service.Save.Services
             if (setting.IsCompression.Value) extension = ".jpg";
             else extension = ".bmp";
 
-            string fileName = $"{parcelCode}_{productCode}.{extension}";
+            string fileName = $"{parcelCode}_{productCode}{extension}";
             string filePath = Path.Combine(directoryPath, fileName);
 
             return filePath;
