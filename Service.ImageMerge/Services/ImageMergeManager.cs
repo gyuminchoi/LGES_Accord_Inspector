@@ -160,6 +160,7 @@ namespace Services.ImageMerge.Services
                             byte[] rawData = null;
                             keyVal.Value.RawDatas.TryDequeue(out rawData);
                             _rawDataDic[keyVal.Key] = rawData;
+                            _logWrite.Info($"{keyVal.Key} Queue Count : {keyVal.Value.RawDatas}");
                         }
 
                         BitmapData bmpData = CreateBitmapData(standardCam.CamConfig);
