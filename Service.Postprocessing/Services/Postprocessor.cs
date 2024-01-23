@@ -87,8 +87,7 @@ namespace Service.Postprocessing.Services
                     Thread.Sleep(10);
                     continue;
                 }
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
+                
                 var ppResult = new PostprocessingResult(vpResult);
 
                 var boxRects = new List<RectangleF>();
@@ -144,8 +143,6 @@ namespace Service.Postprocessing.Services
                 else
                     ppResult.Dispose();
 
-                sw.Stop();
-                _logWrite.Info("PostProcessor : " + sw.ElapsedMilliseconds.ToString() + Environment.NewLine + "Queue Count : " + _visionProResultQueue.Count);
                 Thread.Sleep(10);
             }
         }
@@ -161,7 +158,10 @@ namespace Service.Postprocessing.Services
                     Thread.Sleep(10);
                     continue;
                 }
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
 
+                _logWrite.Info($"VisionPro Queue Count : {_visionProResultQueue.Count}",false,false);
                 var ppResult = new PostprocessingResult(vpResult);
 
                 var boxRects = new List<RectangleF>();
@@ -199,6 +199,8 @@ namespace Service.Postprocessing.Services
                 else
                     ppResult.Dispose();
 
+                sw.Stop();
+                _logWrite.Info("PostProcessor : " + sw.ElapsedMilliseconds.ToString());
                 Thread.Sleep(10);
             }
         }

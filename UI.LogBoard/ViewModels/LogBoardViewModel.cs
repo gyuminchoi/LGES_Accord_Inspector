@@ -15,7 +15,7 @@ namespace UI.LogBoard.ViewModels
     {
         private object _systemLogLock = new object();
         private LogWrite _logWrite = LogWrite.Instance;
-        public AutoDeleteObservableCollection<string> LogBoard { get; set; } = new AutoDeleteObservableCollection<string>(100);
+        public AutoDeleteObservableCollection<string> LogBoard { get; set; } = new AutoDeleteObservableCollection<string>(200);
 
         public DelegateCommand BtnLogResetClickCommand => new DelegateCommand(OnResetLogBoard);
         public DelegateCommand LoadedCommand => new DelegateCommand(OnLoaded);
@@ -26,10 +26,15 @@ namespace UI.LogBoard.ViewModels
         {
             LogWrite.LogBoardUpdateEvent += OnSystemLogUpdate;
             BindingOperations.EnableCollectionSynchronization(LogBoard, _systemLogLock);
-            LogBoard.MaxIndex = 200;
         }
 
-        private void OnSystemLogUpdate(string msg) => LogBoard.Add($"{DateTime.Now}{Environment.NewLine}{msg}");
+        private void OnSystemLogUpdate(string msg)
+        {
+            lock (_systemLogLock)
+            {
+                LogBoard.Add($"{DateTime.Now}{Environment.NewLine}{msg}");
+            }
+        }
 
         private void OnResetLogBoard() => LogBoard.Clear();
     }

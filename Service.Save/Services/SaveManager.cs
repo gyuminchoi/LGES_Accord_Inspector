@@ -127,7 +127,7 @@ namespace Service.Save.Services
         //TODO : Test
         private void Save2(PostprocessingResult ppResult, string path, ImageSetting setting)
         {
-            string filePath;
+            string filePath = string.Empty;
             try
             {
                 int parcel = 0;

@@ -251,6 +251,7 @@ namespace Service.VisionPro.Services
                             Thread.Sleep(10);
                             continue;
                         }
+                        _logWrite.Info($"Merge Queue Count : {_mergeBmpQueue.Count}",false,false);
                         Stopwatch sw = new Stopwatch();
                         sw.Start();
                         var vpResult = new VisionProResult(new List<Box>());
@@ -282,11 +283,13 @@ namespace Service.VisionPro.Services
                             vpResult.OriginBmp = cogBmp.ToBitmap();
 
                             VisionProResultQueue.Enqueue(vpResult);
-                            sw.Stop();
-                            _logWrite.Info("VisionPro : " + sw.ElapsedMilliseconds.ToString() + Environment.NewLine + "Queue Count : " + _mergeBmpQueue.Count);
                             mergeBmp.Dispose();
                         }
                         errCount = 0;
+
+
+                        sw.Stop();
+                        _logWrite.Info("VisionPro : " + sw.ElapsedMilliseconds.ToString());
                         Thread.Sleep(10);
                     }
                     catch (Exception err)
