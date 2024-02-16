@@ -11,14 +11,10 @@ namespace Service.VisionPro.Models
     public class VisionProResult : IDisposable
     {
         public DateTime InspectionTime { get; set; }
-        public Bitmap OriginBmp { get; set; }
+        public Bitmap Bmp { get; set; }
         public List<Box> BoxDatas { get; set; }
         public bool IsPass { get; set; }
 
-        public VisionProResult(List<Box> boxDatas) 
-        {
-            BoxDatas = boxDatas;
-        }
         public VisionProResult()
         {
                 
@@ -39,8 +35,9 @@ namespace Service.VisionPro.Models
 
         public void Dispose()
         {
-            if (OriginBmp != null) { OriginBmp.Dispose(); }
             foreach (Box box in BoxDatas) {  box.Dispose(); }
+            if (Bmp != null) { Bmp.Dispose(); }
+            BoxDatas.Clear();
         }
     }
 }

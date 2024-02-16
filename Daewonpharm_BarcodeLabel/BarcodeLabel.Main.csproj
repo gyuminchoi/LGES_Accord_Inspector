@@ -291,6 +291,10 @@
       <Project>{CE51A3AD-9CE7-4F82-9A32-59575BC61038}</Project>
       <Name>Service.Database</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Service.Delete\Service.Delete.csproj">
+      <Project>{1F698561-0221-4F08-9657-9F66BCDCC57C}</Project>
+      <Name>Service.Delete</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Service.Drawing\Service.Drawing.csproj">
       <Project>{320d746d-2e95-4b08-a758-fdddaec98198}</Project>
       <Name>Service.Drawing</Name>
@@ -298,10 +302,6 @@
     <ProjectReference Include="..\Service.ImageMerge\Service.ImageMerge.csproj">
       <Project>{72b5b909-5d50-4aeb-9eb5-afe6720837c0}</Project>
       <Name>Service.ImageMerge</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Service.Inspection\Service.Inspection.csproj">
-      <Project>{ceec9cb0-a420-4fec-8669-37cb34541c0f}</Project>
-      <Name>Service.Inspection</Name>
     </ProjectReference>
     <ProjectReference Include="..\Service.IOController\Service.IOController.csproj">
       <Project>{b84d742d-71a4-447d-8bea-284a8e136924}</Project>
@@ -314,6 +314,10 @@
     <ProjectReference Include="..\Service.Logger\Service.Logger.csproj">
       <Project>{E0E1686B-BD6D-4CC3-B44A-E85CF9419CDA}</Project>
       <Name>Service.Logger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.MainInspection\Service.MainInspection.csproj">
+      <Project>{38B49E76-CABD-4B0E-AD3C-D32E96097BB2}</Project>
+      <Name>Service.MainInspection</Name>
     </ProjectReference>
     <ProjectReference Include="..\Service.Pattern\Service.Pattern.csproj">
       <Project>{7CDA4A51-DE38-4DDD-BF00-53C9EAFA72AD}</Project>

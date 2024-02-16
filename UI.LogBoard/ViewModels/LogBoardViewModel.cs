@@ -15,7 +15,7 @@ namespace UI.LogBoard.ViewModels
     {
         private object _systemLogLock = new object();
         private LogWrite _logWrite = LogWrite.Instance;
-        public AutoDeleteObservableCollection<string> LogBoard { get; set; } = new AutoDeleteObservableCollection<string>(200);
+        public AutoDeleteObservableCollection<string> LogBoard { get; set; } = new AutoDeleteObservableCollection<string>(10);
 
         public DelegateCommand BtnLogResetClickCommand => new DelegateCommand(OnResetLogBoard);
         public DelegateCommand LoadedCommand => new DelegateCommand(OnLoaded);
@@ -36,6 +36,12 @@ namespace UI.LogBoard.ViewModels
             }
         }
 
-        private void OnResetLogBoard() => LogBoard.Clear();
+        private void OnResetLogBoard() 
+        {
+            lock (_systemLogLock)
+            {
+                LogBoard.Clear();
+            }
+        } 
     }
 }

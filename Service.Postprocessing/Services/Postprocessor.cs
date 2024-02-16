@@ -24,7 +24,7 @@ namespace Service.Postprocessing.Services
         private VisionProRecipe _loadedRecipe;
         public bool IsRun { get; set; } = false;
 
-        public delegate void PostprocessCompleteDelegate(PostprocessingResult result);
+        public delegate void PostprocessCompleteDelegate(VisionProResult result);
         public event PostprocessCompleteDelegate PostprocessComplete;
 
         public delegate void DisplayUpdateDelegate(DisplayData displayData);
@@ -45,8 +45,7 @@ namespace Service.Postprocessing.Services
             try
             {
                 IsRun = true;
-                //TODO :Test
-                _imageDrawThread = new Thread(new ThreadStart(ImageDrawProcess2));
+                _imageDrawThread = new Thread(new ThreadStart(ImageDrawProcess));
                 _imageDrawThread.Name = "VisionPro Inspection Thread";
                 _imageDrawThread.Start();
             }
@@ -76,6 +75,67 @@ namespace Service.Postprocessing.Services
             }
         }
 
+        public void CreateOverlayBmp(VisionProResult vpResult)
+        {
+            int boxCount = vpResult.BoxDatas.Count;
+            int barcodeCount = vpResult.GetBarcodeCount();
+
+            // 찾은 박스가 없다면
+            if (vpResult.BoxDatas.Count == 0)
+            {
+                IntPtr nonBoxPImage = IntPtr.Zero;
+                _bmpConvertor.BitmapToInPtr(vpResult.Bmp, ref nonBoxPImage);
+
+                DisplayData nonBoxDisplayData = new DisplayData()
+                {
+                    PImage = nonBoxPImage,
+                    BoxCount = boxCount,
+                    BarcodeCount = barcodeCount,
+                    IsPass = vpResult.IsPass
+                };
+
+                // UI 업데이트
+                DisplayUpdateEvent(nonBoxDisplayData);
+                return;
+            }
+
+            var boxRects = new List<RectangleF>();
+            var barcodeRects = new List<RectangleF>();
+
+            // 좌표값을 통해 Rect 생성
+            for (int i = 0; i < vpResult.BoxDatas.Count; i++)
+            {
+                CreateBoxRectangle(boxRects, vpResult.BoxDatas[i]);
+
+                for (int j = 0; j < vpResult.BoxDatas[i].Barcodes.Count; j++)
+                {
+                    CreateBarcodeRectangle(barcodeRects, vpResult.BoxDatas[i].Barcodes[j], _loadedRecipe);
+                }
+            }
+
+            // TODO: Clone할 경우 내부 IntPtr은 얕은 복사로 된다고 하는데 테스트 해봐야함
+            Bitmap drawBmp = vpResult.Bmp.Clone() as Bitmap;
+
+            _drawingManager.DrawRectangles(drawBmp, _loadedRecipe.BoxColor, _loadedRecipe.PenSize, boxRects);
+            if(barcodeRects.Count > 0)
+                _drawingManager.DrawRectangles(drawBmp, _loadedRecipe.BarcodeColor, _loadedRecipe.PenSize, barcodeRects);
+
+            IntPtr boxPImage = IntPtr.Zero;
+            _bmpConvertor.BitmapToInPtr(drawBmp, ref boxPImage);
+            DisplayData boxDisplayData = new DisplayData()
+            {
+                PImage = boxPImage,
+                BarcodeCount = barcodeCount,
+                BoxCount = boxCount,
+                IsPass = vpResult.IsPass
+            };
+
+            // UI 업데이트
+            DisplayUpdateEvent(boxDisplayData);
+            //TODO: Test 해야함.
+            drawBmp.Dispose();
+        }
+
         private void ImageDrawProcess()
         {
             //Tact 40ms
@@ -87,120 +147,64 @@ namespace Service.Postprocessing.Services
                     Thread.Sleep(10);
                     continue;
                 }
-                
-                var ppResult = new PostprocessingResult(vpResult);
 
-                var boxRects = new List<RectangleF>();
-                var barcodeRects = new List<RectangleF>();
-                if (vpResult.BoxDatas.Count > 0) 
-                {
-                    for (int i = 0; i < vpResult.BoxDatas.Count; i++)
-                    {
-                        CreateBoxRectangle(boxRects, vpResult.BoxDatas[i]);
-
-                        if (vpResult.BoxDatas[i].Barcodes != null && vpResult.BoxDatas[i].Barcodes.Count > 0)
-                        {
-                            for (int j = 0; j < vpResult.BoxDatas[i].Barcodes.Count; j++)
-                            {
-                                CreateBarcodeRectangle(barcodeRects, vpResult.BoxDatas[i].Barcodes[j], _loadedRecipe);
-                            }
-                        }
-                    }
-                }
-
-                if (boxRects.Count > 0)
-                {
-                    Bitmap drawBmp = null;
-
-                    drawBmp = _drawingManager.DrawRectangles(vpResult.OriginBmp.Clone() as Bitmap, _loadedRecipe.BoxColor, _loadedRecipe.PenSize, boxRects);
-
-                    if (barcodeRects.Count > 0)
-                        ppResult.OverlayBmp = _drawingManager.DrawRectangles(drawBmp, _loadedRecipe.BarcodeColor, _loadedRecipe.PenSize, barcodeRects);
-                    else
-                        ppResult.OverlayBmp = drawBmp;
-                }
-                else
-                    ppResult.OverlayBmp = vpResult.OriginBmp.Clone() as Bitmap;
-                
-
-                // UI에 뿌려줄 데이터 생성
                 int boxCount = vpResult.BoxDatas.Count;
                 int barcodeCount = vpResult.GetBarcodeCount();
 
-                BitmapImage bmpImage = _bmpConvertor.BitmapToBitmapImage(ppResult.OverlayBmp);
-
-                DisplayData displayData = new DisplayData()
+                // 찾은 박스가 없다면
+                if (vpResult.BoxDatas.Count == 0)
                 {
-                    BmpImage = bmpImage,
-                    BoxCount = boxCount,
-                    BarcodeCount = barcodeCount
-                };
-                DisplayUpdateEvent(displayData);
+                    IntPtr nonBoxPImage = IntPtr.Zero;
+                    _bmpConvertor.BitmapToInPtr(vpResult.Bmp, ref nonBoxPImage);
 
-                // SaveManager에 뿌려줌
-                if (vpResult.IsPass)
-                    PostprocessComplete(ppResult);
-                else
-                    ppResult.Dispose();
+                    DisplayData nonBoxDisplayData = new DisplayData()
+                    {
+                        PImage = nonBoxPImage,
+                        BoxCount = boxCount,
+                        BarcodeCount = barcodeCount
+                    };
 
-                Thread.Sleep(10);
-            }
-        }
-        //TODO :test
-        private void ImageDrawProcess2()
-        {
-            //Tact 40ms
-            while (IsRun)
-            {
-                VisionProResult vpResult = null;
-                if (!_visionProResultQueue.TryDequeue(out vpResult))
-                {
-                    Thread.Sleep(10);
-                    continue;
+                    // UI 업데이트
+                    DisplayUpdateEvent(nonBoxDisplayData);
+                    return;
                 }
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
 
-                _logWrite.Info($"VisionPro Queue Count : {_visionProResultQueue.Count}",false,false);
-                var ppResult = new PostprocessingResult(vpResult);
-
+                // 찾은 박스가 있다면
                 var boxRects = new List<RectangleF>();
                 var barcodeRects = new List<RectangleF>();
-                if (vpResult.BoxDatas.Count > 0)
+
+                // 좌표값을 통해 Rect 생성
+                for (int i = 0; i < vpResult.BoxDatas.Count; i++)
                 {
-                    for (int i = 0; i < vpResult.BoxDatas.Count; i++)
+                    CreateBoxRectangle(boxRects, vpResult.BoxDatas[i]);
+
+                    for (int j = 0; j < vpResult.BoxDatas[i].Barcodes.Count; j++)
                     {
-                        CreateBoxRectangle(boxRects, vpResult.BoxDatas[i]);
+                        CreateBarcodeRectangle(barcodeRects, vpResult.BoxDatas[i].Barcodes[j], _loadedRecipe);
                     }
                 }
 
-                if (boxRects.Count > 0)
-                    ppResult.OverlayBmp = _drawingManager.DrawRectangles(vpResult.OriginBmp.Clone() as Bitmap, _loadedRecipe.BoxColor, _loadedRecipe.PenSize, boxRects);
-                else
-                    ppResult.OverlayBmp = vpResult.OriginBmp.Clone() as Bitmap;
+                // TODO: Clone할 경우 내부 IntPtr은 얕은 복사로 된다고 하는데 테스트 해봐야함
+                // 오버레이 이미지 생성
+                Bitmap drawBmp = vpResult.Bmp.Clone() as Bitmap;
 
+                _drawingManager.DrawRectangles(drawBmp, _loadedRecipe.BoxColor, _loadedRecipe.PenSize, boxRects);
+                if (barcodeRects.Count > 0)
+                    _drawingManager.DrawRectangles(drawBmp, _loadedRecipe.BarcodeColor, _loadedRecipe.PenSize, barcodeRects);
 
-                // UI에 뿌려줄 데이터 생성
-                int boxCount = vpResult.BoxDatas.Count;
-                int barcodeCount = 0;
-
-                BitmapImage bmpImage = _bmpConvertor.BitmapToBitmapImage(ppResult.OverlayBmp);
-                DisplayData displayData = new DisplayData()
+                IntPtr boxPImage = IntPtr.Zero;
+                _bmpConvertor.BitmapToInPtr(drawBmp, ref boxPImage);
+                DisplayData boxDisplayData = new DisplayData()
                 {
-                    BmpImage = bmpImage,
+                    PImage = boxPImage,
+                    BarcodeCount = barcodeCount,
                     BoxCount = boxCount,
-                    BarcodeCount = barcodeCount
                 };
-                DisplayUpdateEvent(displayData);
 
-                // SaveManager에 뿌려줌
-                if (vpResult.IsPass)
-                    PostprocessComplete(ppResult);
-                else
-                    ppResult.Dispose();
-
-                sw.Stop();
-                _logWrite.Info("PostProcessor : " + sw.ElapsedMilliseconds.ToString());
+                // UI 업데이트
+                DisplayUpdateEvent(boxDisplayData);
+                //TODO: Test 해야함.
+                drawBmp.Dispose();
                 Thread.Sleep(10);
             }
         }

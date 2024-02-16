@@ -7,8 +7,12 @@ using Service.Setting.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -33,7 +37,7 @@ namespace Service.Camera.Services
                 UpdateDevice();
 
                 uint camCount = CanOpenCameraNum();
-                if(camCount == 0 ) 
+                if (camCount == 0)
                 {
                     _logWrite?.Error($"Camera Init Fail (Cam Count - {camCount})");
                 }
@@ -106,6 +110,63 @@ namespace Service.Camera.Services
                 flags.Add(item.Value.CamConfig.IsOpen);
             }
             return flags;
+        }
+
+        //TODO :TestMethod
+        public void TestEnqueue()
+        {
+            Bitmap bmp1 = new Bitmap(@"C:\Users\TSgyuminChoi\Desktop\대원제약 검토 자료\1101\Test2\Bot\1.bmp");
+            Bitmap bmp2 = new Bitmap(@"C:\Users\TSgyuminChoi\Desktop\대원제약 검토 자료\1101\Test2\Bot\right1.bmp");
+            Bitmap bmp3 = new Bitmap(@"C:\Users\TSgyuminChoi\Desktop\대원제약 검토 자료\1101\Test2\Top\right2.bmp");
+            Bitmap bmp4 = new Bitmap(@"C:\Users\TSgyuminChoi\Desktop\대원제약 검토 자료\1101\Test2\Top\1.bmp");
+
+            byte[] bmp1RawData = BitmapToByteArray(bmp1);
+            byte[] bmp2RawData = BitmapToByteArray(bmp2);
+            byte[] bmp3RawData = BitmapToByteArray(bmp4);
+            byte[] bmp4RawData = BitmapToByteArray(bmp3);
+            Thread _testThread = new Thread(() =>
+            {
+                while (true)
+                {
+                    while (CameraDic["Cam1"].RawDatas.Count == 0 &&
+                         CameraDic["Cam2"].RawDatas.Count == 0 &&
+                         CameraDic["Cam3"].RawDatas.Count == 0 &&
+                         CameraDic["Cam4"].RawDatas.Count == 0) 
+                    {
+                        byte[] bmp1RawDataCopy = new byte[bmp1RawData.Length];
+                        byte[] bmp2RawDataCopy = new byte[bmp2RawData.Length];
+                        byte[] bmp3RawDataCopy = new byte[bmp3RawData.Length];
+                        byte[] bmp4RawDataCopy = new byte[bmp4RawData.Length];
+
+                        Buffer.BlockCopy(bmp1RawData, 0, bmp1RawDataCopy, 0, bmp1RawData.Length);
+                        Buffer.BlockCopy(bmp2RawData, 0, bmp2RawDataCopy, 0, bmp1RawData.Length);
+                        Buffer.BlockCopy(bmp3RawData, 0, bmp3RawDataCopy, 0, bmp1RawData.Length);
+                        Buffer.BlockCopy(bmp4RawData, 0, bmp4RawDataCopy, 0, bmp1RawData.Length);
+
+                        CameraDic["Cam1"].RawDatas.Enqueue(bmp1RawData);
+                        CameraDic["Cam2"].RawDatas.Enqueue(bmp2RawData);
+                        CameraDic["Cam3"].RawDatas.Enqueue(bmp3RawData);
+                        CameraDic["Cam4"].RawDatas.Enqueue(bmp4RawData);
+                    }
+                    Thread.Sleep(1500);
+                }
+            });
+            _testThread.Start();
+        }
+
+        //TODO :TestMethod
+        public byte[] BitmapToByteArray(Bitmap bitmap)
+        {
+            BitmapData bmpdata = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
+
+            int numbytes = bmpdata.Stride * bitmap.Height;
+            byte[] bytedata = new byte[numbytes];
+            IntPtr ptr = bmpdata.Scan0;
+            Marshal.Copy(ptr, bytedata, 0, numbytes);
+
+            bitmap.UnlockBits(bmpdata);
+
+            return bytedata;
         }
 
         private void VirtualFGInit()

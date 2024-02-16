@@ -7,7 +7,6 @@ namespace Service.VisionPro.Services
 {
     public class VisionProManager : IVisionProManager
     {
-        
         private IImageMergeManager _imManager;
         private ISQLiteManager _sqliteManager;
         public Dictionary<string, VisionProInspector> InspectorDic { get; set; } = new Dictionary<string, VisionProInspector>();

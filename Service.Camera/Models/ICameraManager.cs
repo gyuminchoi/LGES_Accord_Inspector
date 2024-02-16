@@ -25,5 +25,6 @@ namespace Service.Camera.Models
         void SetParameters(ECameraGetSetType camGetSetType, string command, object value);
 
         List<bool> OpenChecks();
+        void TestEnqueue();
     }
 }

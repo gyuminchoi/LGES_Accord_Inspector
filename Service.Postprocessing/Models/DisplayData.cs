@@ -9,8 +9,9 @@ namespace Service.Postprocessing.Models
 {
     public class DisplayData
     {
-        public BitmapImage BmpImage { get; set; }
+        public IntPtr PImage { get; set; }
         public int BoxCount { get; set; }
         public int BarcodeCount { get; set; }
+        public bool IsPass { get; set; }
     }
 }

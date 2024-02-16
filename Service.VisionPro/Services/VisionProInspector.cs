@@ -19,9 +19,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Service.VisionPro.Services
 {
+    
     public class VisionProInspector : IDisposable
     {
         private LogWrite _logWrite = LogWrite.Instance;
@@ -50,7 +52,7 @@ namespace Service.VisionPro.Services
                 DisposeTools();
                 _patMaxTool = LoadFile(recipe.PatMaxToolPath) as CogPMAlignTool;
                 _affineTool = LoadFile(recipe.AffineToolPath) as CogAffineTransformTool;
-                //_idTool = LoadFile(recipe.IDToolPath) as CogIDTool;
+                _idTool = LoadFile(recipe.IDToolPath) as CogIDTool;
                 _loadedRecipe = recipe;
             }
             catch (Exception err)
@@ -74,8 +76,8 @@ namespace Service.VisionPro.Services
                 }
 
                 IsRun = true;
-                //TODO : Test
-                _inspectThread = new Thread(new ThreadStart(InspectionProcess2));
+
+                _inspectThread = new Thread(new ThreadStart(InspectionProcess));
                 _inspectThread.Name = "VisionPro Inspection Thread";
                 _inspectThread.Start();
             }
@@ -114,6 +116,63 @@ namespace Service.VisionPro.Services
             }
         }
 
+        public VisionProResult BCRInspection(MergeBitmap mergeBmp) 
+        {
+            var vpResult = new VisionProResult() { BoxDatas = new List<Box>() };
+
+            using (var cogBmp = new CogImage8Grey(mergeBmp.Bmp))
+            {
+                PMAlignToolRun(_patMaxTool, cogBmp);
+
+                // 0개라면 다음 검사 안함.
+                for (int i = 0; i < _patMaxTool.Results.Count; i++)
+                {
+                    AffineToolRun(_affineTool, _patMaxTool, i, cogBmp);
+                    Box box = new Box(
+                        cropBmp: _affineTool.OutputImage.ToBitmap(),
+                        x: _affineTool.Region.CenterX,
+                        y: _affineTool.Region.CenterY,
+                        width: _affineTool.Region.SideXLength,
+                        height: _affineTool.Region.SideYLength);
+                    vpResult.BoxDatas.Add(box);
+
+                    IDToolRun(_idTool, _affineTool.OutputImage);
+
+                    vpResult.BoxDatas[i].Barcodes = new List<Barcode>();
+                    for (int j = 0; j < _idTool.Results.Count; j++)
+                    {
+                        Barcode barcode = new Barcode(
+                            x: _idTool.Results[j].CenterX,
+                            y: _idTool.Results[j].CenterY,
+                            code: _idTool.Results[j].DecodedData.DecodedString);
+
+                        vpResult.BoxDatas[i].Barcodes.Add(barcode);
+                    }
+
+                    if (vpResult.BoxDatas[i].Barcodes.Count >= 2)
+                        box.Barcodes.Sort((barcode1, barcode2) => barcode1.Code.Length.CompareTo(barcode2.Code.Length));
+                }
+                
+                vpResult.Bmp = cogBmp.ToBitmap();
+
+                // PM Align 검사 결과 Fail이라면
+                bool boxInspectionResult = BoxInspection(_patMaxTool, _loadedRecipe);
+                if (!boxInspectionResult)
+                {
+                    vpResult.IsPass = false;
+                    return vpResult;
+                }
+
+                vpResult.IsPass = BarcodeInspection(vpResult, _loadedRecipe);
+
+                //TODO :Test 
+                vpResult.IsPass = true;
+
+                return vpResult;
+            }
+        }
+
+
         private void InspectionProcess()
         {
             int errCount = 0;
@@ -130,137 +189,13 @@ namespace Service.VisionPro.Services
                             continue;
                         }
 
-                        var vpResult = new VisionProResult(new List<Box>());
+                        var vpResult = new VisionProResult() { BoxDatas = new List<Box>() };
 
                         using (var cogBmp = new CogImage8Grey(mergeBmp.Bmp))
                         {
                             PMAlignToolRun(_patMaxTool, cogBmp);
 
-                            // PM Align 검사 결과 Fail이라면
-                            if(_patMaxTool.Results.Count != _loadedRecipe.SideBoxCount || _patMaxTool.Results.Count != _loadedRecipe.FrontBoxCount)
-                            {
-                                if (_patMaxTool.Results.Count > 0)
-                                {
-                                    for (int i = 0; i < _patMaxTool.Results.Count; i++)
-                                    {
-                                        AffineToolRun(_affineTool, _patMaxTool, i, cogBmp);
-
-                                        Box box = new Box(
-                                            cropBmp: _affineTool.OutputImage.ToBitmap(),
-                                            x: _affineTool.Region.CenterX,
-                                            y: _affineTool.Region.CenterY,
-                                            width: _affineTool.Region.SideXLength,
-                                            height: _affineTool.Region.SideYLength);
-
-                                        vpResult.BoxDatas.Add(box);
-
-                                        IDToolRun(_idTool, _affineTool.OutputImage);
-
-                                        vpResult.BoxDatas[i].Barcodes = new List<Barcode>();
-                                        for (int j = 0; j < _idTool.Results.Count; j++)
-                                        {
-                                            Barcode barcode = new Barcode(
-                                                x: _idTool.Results[j].CenterX,
-                                                y: _idTool.Results[j].CenterY,
-                                                code: _idTool.Results[j].DecodedData.DecodedString);
-
-                                            vpResult.BoxDatas[i].Barcodes.Add(barcode);
-                                        }
-                                    }
-                                }
-
-                                vpResult.IsPass = false;
-                                vpResult.InspectionTime = DateTime.Now;
-                                vpResult.OriginBmp = cogBmp.ToBitmap();
-
-                                VisionProResultQueue.Enqueue(vpResult);
-                                continue;
-                            }
-                            // PM Align 검사 결과 Pass 라면
-                            for (int i = 0; i < _patMaxTool.Results.Count; i++)
-                            {
-                                AffineToolRun(_affineTool, _patMaxTool, i, cogBmp);
-
-                                Box box = new Box(
-                                    cropBmp: _affineTool.OutputImage.ToBitmap(),
-                                    x: _affineTool.Region.CenterX,
-                                    y: _affineTool.Region.CenterY,
-                                    width: _affineTool.Region.SideXLength,
-                                    height: _affineTool.Region.SideYLength);
-
-                                vpResult.BoxDatas.Add(box);
-
-                                IDToolRun(_idTool, _affineTool.OutputImage);
-
-                                vpResult.BoxDatas[i].Barcodes = new List<Barcode>();
-                                
-                                for (int j = 0; j < _idTool.Results.Count; j++)
-                                {
-                                    Barcode barcode = new Barcode(
-                                        x: _idTool.Results[j].CenterX, 
-                                        y: _idTool.Results[j].CenterY, 
-                                        code: _idTool.Results[j].DecodedData.DecodedString);
-
-                                    vpResult.BoxDatas[i].Barcodes.Add(barcode);
-                                }
-                            }
-
-                            vpResult.IsPass = BarcodeInspect(vpResult, _loadedRecipe);
-                            vpResult.InspectionTime = DateTime.Now;
-                            vpResult.OriginBmp = cogBmp.ToBitmap();
-
-                            VisionProResultQueue.Enqueue(vpResult);
-
-                            mergeBmp.Dispose();
-                        }
-                        errCount = 0;
-                        Thread.Sleep(10);
-                    }
-                    catch (Exception err)
-                    {
-                        _logWrite?.Error(err, false, true);
-
-                        if (errCount > 100)
-                        {
-                            _logWrite?.Error(err);
-                            break;
-                        }
-                        errCount++;
-                    }
-                }
-            }
-            catch (Exception err)
-            {
-                _logWrite.Error(err);
-            }
-        }
-        //TODO : Test
-        //165ms
-        private void InspectionProcess2()
-        {
-            int errCount = 0;
-            try
-            {
-                while (IsRun)
-                {
-                    try
-                    {
-                        MergeBitmap mergeBmp = null;
-                        if (!_mergeBmpQueue.TryDequeue(out mergeBmp))
-                        {
-                            Thread.Sleep(10);
-                            continue;
-                        }
-                        _logWrite.Info($"Merge Queue Count : {_mergeBmpQueue.Count}",false,false);
-                        Stopwatch sw = new Stopwatch();
-                        sw.Start();
-                        var vpResult = new VisionProResult(new List<Box>());
-
-                        using (var cogBmp = new CogImage8Grey(mergeBmp.Bmp))
-                        {
-                            PMAlignToolRun(_patMaxTool, cogBmp);
-
-                            if(_patMaxTool.Results.Count > 0)
+                            if (_patMaxTool.Results.Count > 0)
                             {
                                 // PM Align 검사 결과 Pass 라면
                                 for (int i = 0; i < _patMaxTool.Results.Count; i++)
@@ -275,21 +210,46 @@ namespace Service.VisionPro.Services
                                         height: _affineTool.Region.SideYLength);
 
                                     vpResult.BoxDatas.Add(box);
+
+                                    IDToolRun(_idTool, _affineTool.OutputImage);
+
+                                    vpResult.BoxDatas[i].Barcodes = new List<Barcode>();
+                                    for (int j = 0; j < _idTool.Results.Count; j++)
+                                    {
+                                        Barcode barcode = new Barcode(
+                                            x: _idTool.Results[j].CenterX,
+                                            y: _idTool.Results[j].CenterY,
+                                            code: _idTool.Results[j].DecodedData.DecodedString);
+
+                                        vpResult.BoxDatas[i].Barcodes.Add(barcode);
+                                    }
+
+                                    if (vpResult.BoxDatas[i].Barcodes.Count == 2)
+                                        box.Barcodes.Sort((barcode1, barcode2) => barcode1.Code.Length.CompareTo(barcode2.Code.Length));
                                 }
                             }
-                            
-                            vpResult.IsPass = true;
+
                             vpResult.InspectionTime = DateTime.Now;
-                            vpResult.OriginBmp = cogBmp.ToBitmap();
+                            vpResult.Bmp = cogBmp.ToBitmap();
 
-                            VisionProResultQueue.Enqueue(vpResult);
+                            // PM Align 검사 결과 Fail이라면
+                            bool boxInspectionResult = BoxInspection(_patMaxTool, _loadedRecipe);
+                            if (!boxInspectionResult)
+                            {
+                                vpResult.IsPass = false;
+                                mergeBmp.Dispose();
+
+                                VisionProResultQueue.Enqueue(vpResult);
+                                continue;
+                            }
+
+                            //vpResult.IsPass = BarcodeInspection(vpResult, _loadedRecipe);
+                            //vpResult.IsPass = true;
                             mergeBmp.Dispose();
+                            VisionProResultQueue.Enqueue(vpResult);
                         }
+
                         errCount = 0;
-
-
-                        sw.Stop();
-                        _logWrite.Info("VisionPro : " + sw.ElapsedMilliseconds.ToString());
                         Thread.Sleep(10);
                     }
                     catch (Exception err)
@@ -311,21 +271,24 @@ namespace Service.VisionPro.Services
             }
         }
 
-        private bool BarcodeInspect(VisionProResult result, VisionProRecipe recipe)
+        private bool BoxInspection(CogPMAlignTool pmAlignTool, VisionProRecipe recipe)
         {
+            if(pmAlignTool.Results.Count == recipe.SideBoxCount || pmAlignTool.Results.Count == recipe.FrontBoxCount)
+                return true;
+            else 
+                return false;
+        }
+
+        private bool BarcodeInspection(VisionProResult result, VisionProRecipe recipe)
+        {
+            DateTime date = DateTime.Now.AddDays(recipe.DateRange * -1);
+
             foreach (var box in result.BoxDatas)
             {
                 if (box.Barcodes.Count != recipe.BarcodeCount) return false;
 
-                box.Barcodes.Sort((barcode1, barcode2) => barcode1.Code.Length.CompareTo(barcode2.Code.Length));
-                DateTime date = DateTime.Now.AddDays(recipe.DateRange * -1);
-
-                // TODO: 하드 코딩 변경하면 좋음 
-                DataTable parcelCodes = _sqliteManager.Search(box.Barcodes[0].Code, null,DateTime.Now, date);
-                if (parcelCodes.Rows.Count > 0) return false;
-
-                DataTable productCodes = _sqliteManager.Search(null, box.Barcodes[1].Code, DateTime.Now, date);
-                if (productCodes.Rows.Count > 0) return false;
+                int count = _sqliteManager.SearchCount(box.Barcodes[0].Code, box.Barcodes[1].Code, DateTime.Now, date);
+                if (count > 0) return false;
             }
 
             return true;

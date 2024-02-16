@@ -16,7 +16,6 @@ namespace Service.Setting.Models
         private bool? _isSaveImage;
         private string _inspectionImageSavePath;
         private string _liveImageSavePath;
-        //TODO : 여기 압축여부, 이미지 저장 여부로 변경해야함
         public bool? IsCompression { get => _isCompression; set => SetProperty(ref _isCompression, value); }
         public bool? IsSaveImage { get => _isSaveImage; set => SetProperty(ref _isSaveImage, value); }
         public string InspectionImageSavePath { get => _inspectionImageSavePath; set => SetProperty(ref _inspectionImageSavePath, value); }

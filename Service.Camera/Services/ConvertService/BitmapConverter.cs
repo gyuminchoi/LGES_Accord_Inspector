@@ -31,14 +31,34 @@ namespace Service.Camera.Services.ConvertService
 
         public Bitmap IntPtrToBitmap(BitmapData bmpData, IntPtr pImage)
         {
-            Bitmap bmp;
-
-            bmp = new Bitmap(bmpData.Width, bmpData.Height, bmpData.Stride, bmpData.PixelFormat, pImage);
+            Bitmap bmp = new Bitmap(bmpData.Width, bmpData.Height, bmpData.Stride, bmpData.PixelFormat, pImage);
 
             SetGrayScale(ref bmp);
 
             return bmp;
         }
+
+
+        /// <summary>
+        /// 얕은 복사 됨
+        /// </summary>
+        /// <param name="bmp"></param>
+        /// <param name="pImage"></param>
+        public void BitmapToInPtr(Bitmap bmp, ref IntPtr pImage)
+        {
+            BitmapData bmpdata = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
+            bmp.UnlockBits(bmpdata);
+            pImage = bmpdata.Scan0;
+        }
+
+        /// <summary>
+        /// 깊은 복사
+        /// </summary>
+        /// <param name="dest"></param>
+        /// <param name="src"></param>
+        /// <param name="count"></param>
+        [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
+        public static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
 
 
         public Bitmap ByteArrayToBitmap(BitmapData originalData, byte[] source, PixelFormat format)

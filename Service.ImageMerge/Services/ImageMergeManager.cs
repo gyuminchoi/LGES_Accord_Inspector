@@ -129,7 +129,8 @@ namespace Services.ImageMerge.Services
             {
             }
         }
-        //300ms
+
+        // 200 ~ 250 ms
         private void ImageMergeProcess()
         {
             try
@@ -153,8 +154,8 @@ namespace Services.ImageMerge.Services
                             Thread.Sleep(10);
                             continue;
                         }
-                        Stopwatch sw = new Stopwatch();
-                        sw.Start();
+                        //Stopwatch sw = new Stopwatch();
+                        //sw.Start();
                         foreach (var keyVal in _cameraManager.CameraDic)
                         {
                             byte[] rawData = null;
@@ -170,8 +171,8 @@ namespace Services.ImageMerge.Services
                         MergeRawData(topRawData, _rawDataDic["Cam2"], _rawDataDic["Cam1"]);
                         // Raw Data => InPtr => Bitmap 순으로 생성
                         MergeBitmap topMergeBmp = RawDataToMergeBitmap(topRawData, bmpData);
-                        //topMergeBmp.Bmp.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                        
+                        topMergeBmp.Bmp.RotateFlip(RotateFlipType.Rotate90FlipNone);
+
                         TopMergeBitmapQueue.Enqueue(topMergeBmp);
 
                         // Bottom Raw Data 병합
@@ -180,11 +181,11 @@ namespace Services.ImageMerge.Services
 
                         // Raw Data => InPtr => Bitmap 순으로 생성
                         MergeBitmap botMergeBmp = RawDataToMergeBitmap(botRawData, bmpData);
-                        //botMergeBmp.Bmp.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                        botMergeBmp.Bmp.RotateFlip(RotateFlipType.Rotate90FlipNone);
 
                         BotMergeBitmapQueue.Enqueue(botMergeBmp);
-                        sw.Stop();
-                        _logWrite.Info("ImageMerge : " + sw.ElapsedMilliseconds.ToString());
+                        //sw.Stop();
+                        //_logWrite.Info("ImageMerge : " + sw.ElapsedMilliseconds.ToString());
                         Thread.Sleep(10);
                     }
                     catch (Exception err)
@@ -245,6 +246,15 @@ namespace Services.ImageMerge.Services
             };
 
             return bmpData;
+        }
+        public MergeBitmap CreateMergeBitmap(BitmapData bmpDatam, int bufferSize, byte[] topRawData, byte[] botRawData)
+        {
+            byte[] mergeRawData = new byte[bufferSize];
+            MergeRawData(mergeRawData, topRawData, botRawData);
+            MergeBitmap mergeBmp = RawDataToMergeBitmap(mergeRawData, bmpDatam);
+            mergeBmp.Bmp.RotateFlip(RotateFlipType.Rotate90FlipNone);
+
+            return mergeBmp;
         }
     }
 }

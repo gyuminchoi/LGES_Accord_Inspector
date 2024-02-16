@@ -38,6 +38,7 @@ namespace Service.Camera.Services
         public ConcurrentQueue<byte[]> RawDatas { get; set; } = new ConcurrentQueue<byte[]>();
         //public ConcurrentQueue<Bitmap> ReceiveImageDatas { get; set; } = new ConcurrentQueue<Bitmap>();
         public int MaxEnqueueCount { get; set; } = 1000;
+        public bool IsEnqueue { get; set; } = false;
 
         //public event EventHandler<string> ReceiveImageDataEnqueueComplete;
         public event EventHandler<string> ReceiveRawDataEnqueueComplete;
@@ -83,7 +84,7 @@ namespace Service.Camera.Services
             }
 
             //TODO : TriggerMode Test
-            SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_USER_SET_SELECTOR, VirtualFG40Library.USER_SET_SELECTOR_USER_SET_3);
+            SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_USER_SET_SELECTOR, VirtualFG40Library.USER_SET_SELECTOR_USER_SET_2);
             SetParameter(ECameraGetSetType.VFGCmd, VirtualFG40Library.MCAM_USER_SET_LOAD, null);
             //SetParameter(ECameraGetSetType.VFGInt, VirtualFG40Library.GEV_SCPS_PACKETSIZE, 8192);
             //SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_TRIGGER_MODE, VirtualFG40Library.TRIGGER_MODE_ON);
@@ -609,6 +610,7 @@ namespace Service.Camera.Services
                 _logWrite?.Error(ex); 
             }
         }
+
         //public void ImageProcess()
         //{
         //    try

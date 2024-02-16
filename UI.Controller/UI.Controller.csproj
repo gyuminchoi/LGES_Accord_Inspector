@@ -127,6 +127,10 @@
       <Project>{72B5B909-5D50-4AEB-9EB5-AFE6720837C0}</Project>
       <Name>Service.ImageMerge</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Service.MainInspection\Service.MainInspection.csproj">
+      <Project>{38B49E76-CABD-4B0E-AD3C-D32E96097BB2}</Project>
+      <Name>Service.MainInspection</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Service.Postprocessing\Service.Postprocessing.csproj">
       <Project>{E02AED11-1AB5-4BC8-8E81-8D0923AA81AF}</Project>
       <Name>Service.Postprocessing</Name>

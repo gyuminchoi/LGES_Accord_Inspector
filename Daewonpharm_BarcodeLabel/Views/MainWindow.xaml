@@ -44,17 +44,17 @@
             </Grid.ColumnDefinitions>
 
             <!--<Border Grid.ColumnSpan="4" Background="#333333" BorderBrush="#9966FF" BorderThickness="0,0,0,2"/>-->
-            
+
             <!-- Logo -->
             <Image Grid.Column="0" Margin="5" HorizontalAlignment="Left"
-                   Source="C:\Users\TSgyuminChoi\source\repos\Daewonpharm_BarcodeLabel\Daewonpharm_BarcodeLabel\Resources\Images\crevis_logo.jpg"/>
-            
+                   Source="\BarcodeLabel.Core;component\Images\crevis_logo(ver03)_로고칼라적용(png).png"/>
+
             <!-- Program Name -->
             <TextBlock Grid.Column="1"
                        VerticalAlignment="Center" HorizontalAlignment="Center"
                        Foreground="LightGray" FontSize="48" FontWeight="Bold"
                        Text="Project Name"/>
-            
+
             <!-- Time & Version -->
             <StackPanel Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock 
@@ -94,10 +94,11 @@
             </Grid.RowDefinitions>
             <Grid Margin="5">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.75*"/>
-                    <ColumnDefinition Width="0.25*"/>
+                    <ColumnDefinition Width="427*"/>
+                    <ColumnDefinition Width="1006*"/>
+                    <ColumnDefinition Width="478*"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Grid.ColumnSpan="2">
                     <!-- Menu -->
                     <ContentControl prism:RegionManager.RegionName="MenuBarRegion"/>
                     <!-- Controller -->
@@ -106,7 +107,7 @@
                 </StackPanel>
 
                 <!-- Status -->
-                <ContentControl Grid.Column="1" HorizontalAlignment="Center" 
+                <ContentControl Grid.Column="2" HorizontalAlignment="Center" 
                                 prism:RegionManager.RegionName="ConnectStateRegion"/>
             </Grid>
             <Grid Grid.Row="1">
@@ -116,7 +117,7 @@
                 </Grid.ColumnDefinitions>
                 <!-- Viewer -->
                 <ContentControl Grid.Column="0" Margin="5" prism:RegionManager.RegionName="ImageViewerRegion"/>
-                
+
                 <Grid Grid.Column="1" >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="0.55*"/>

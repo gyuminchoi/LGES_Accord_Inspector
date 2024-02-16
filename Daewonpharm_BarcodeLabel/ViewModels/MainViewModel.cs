@@ -7,6 +7,7 @@ using Service.Camera.Models;
 using Service.ConnectionCheck.Services;
 using Service.Database.Services;
 using Service.Logger.Services;
+using Service.MainInspection.Services;
 using Service.Postprocessing.Services;
 using Service.VisionPro.Services;
 using Services.ImageMerge.Services;
@@ -28,6 +29,7 @@ namespace BarcodeLabel.Main.ViewModels
         private IPostprocessingManager _postprocessingManager;
         private ISQLiteManager _sqlLiteManager;
         private IConnectionCheckManager _ccManager;
+        private IMainInpectionManager _miManager;
         private string _version;
 
         public WindowState WindowState { get => _windowState; set => SetProperty(ref _windowState, value); }
@@ -38,15 +40,16 @@ namespace BarcodeLabel.Main.ViewModels
         public DelegateCommand<CancelEventArgs> ClosingCommand => new DelegateCommand<CancelEventArgs>(OnClosing);
         public DelegateCommand BtnMinimizeCommand => new DelegateCommand(OnMinimize);
 
-        public MainViewModel(IEventAggregator ea, ICameraManager cm, IVisionProManager vm, IImageMergeManager imManager, IPostprocessingManager postprocessingManager, ISQLiteManager sqliteManager, IConnectionCheckManager ccm) 
+        public MainViewModel(IEventAggregator ea, ICameraManager cm, IVisionProManager vm, IImageMergeManager imm, IPostprocessingManager ppm, ISQLiteManager sqliteManager, IConnectionCheckManager ccm, IMainInpectionManager mim) 
         {
             _eventAggregator = ea;
             _camManager = cm;
             _vpManager = vm;
-            _imManager = imManager;
-            _postprocessingManager = postprocessingManager;
+            _imManager = imm;
+            _postprocessingManager = ppm;
             _ccManager = ccm;
             _sqlLiteManager = sqliteManager;
+            _miManager = mim;
         }
 
         private void OnLoaded()
@@ -65,6 +68,7 @@ namespace BarcodeLabel.Main.ViewModels
 
                 try
                 {
+                    _miManager.Dispose();
                     _camManager.Closes();
                     _vpManager.Dispose();
                     _imManager.Dispose();

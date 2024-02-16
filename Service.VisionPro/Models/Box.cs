@@ -16,6 +16,8 @@ namespace Service.VisionPro.Models
         public double Width { get; set; }
         public double Height { get; set; }
         public List<Barcode> Barcodes { get; set; }
+
+        public Box() { }
         public Box(Bitmap cropBmp, double x, double y, double width, double height)
         {
             CropBmp = cropBmp;
@@ -28,6 +30,7 @@ namespace Service.VisionPro.Models
         public void Dispose()
         {
             if(CropBmp != null) { CropBmp.Dispose(); }
+            Barcodes.Clear();
         }
     }
 }

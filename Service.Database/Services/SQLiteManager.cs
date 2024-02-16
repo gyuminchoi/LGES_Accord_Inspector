@@ -207,6 +207,45 @@ namespace Service.Database.Services
             }
         }
 
+        public int SearchCount(string parcelBarcode, string productBarcode, DateTime startTime, DateTime endTime)
+        {
+            try
+            {
+                if (!IsOpen) return -1;
+
+                bool isResult = TableExistence();
+                if (!isResult)
+                {
+                    ExecuteCommandComplete?.Invoke(this, "Table not found");
+                    return -1;
+                }
+
+                string start = startTime.ToString("yyyy.MM.dd HH:mm:ss");
+                string end = endTime.ToString("yyyy.MM.dd HH:mm:ss");
+
+                StringBuilder sb = new StringBuilder(4096);
+                sb.Append($"SELECT count(*) FROM {_dbSetting.TableName} WHERE 1=1");
+
+                sb.Append(" AND DATE_TIME BETWEEN '" + start + "' AND '" + end + "' ");
+
+                if (!string.IsNullOrEmpty(parcelBarcode))
+                    sb.Append($" AND PARCEL_BARCODE = '{parcelBarcode}'");
+
+                if (!string.IsNullOrEmpty(productBarcode))
+                    sb.Append($" or PRODUCT_BARCODE = '{productBarcode}'");
+
+                int count = ExecuteQuery(sb.ToString());
+                ExecuteCommandComplete?.Invoke(this, "Data Search Complete");
+                return count;
+            }
+            catch (Exception err)
+            {
+                _logWrite?.Error(err);
+                return -1;
+            }
+            
+        }
+
         public ConnectionState CheckDBState()
         {
             return _dbConnector.State;
@@ -259,8 +298,8 @@ namespace Service.Database.Services
                     // 데이터 쓰기
                     foreach (DataRow row in dt.Rows)
                     {
-                        //TODO : 엑셀에서 0000 -> 0으로 표시되는 것을 방지
-                        line = string.Join(",", row.ItemArray.Cast<object>().Select(r => $"=\"{r}\""));
+                        // TODO : 엑셀에서 0000 -> 0으로 표시되는 것을 방지
+                        line = string.Join(",", row.ItemArray.Cast<object>().Select(r => $"\'{r}"));
                         sw.WriteLine(line);
                     }
                 }
@@ -297,16 +336,17 @@ namespace Service.Database.Services
 
         private int ExecuteQuery(string query)
         {
-            using (SQLiteCommand cmd = new SQLiteCommand(query, _dbConnector))
+            using(SQLiteCommand cmd = new SQLiteCommand(query, _dbConnector))
             {
                 object result = cmd.ExecuteScalar();
+
                 return Convert.ToInt32(result);
             }
         }
 
         private void ExecuteNonQuery(string query)
         {
-            using (SQLiteCommand cmd = new SQLiteCommand(query, _dbConnector))
+            using(SQLiteCommand cmd = new SQLiteCommand(query, _dbConnector))
             {
                 cmd.ExecuteNonQuery();
             }

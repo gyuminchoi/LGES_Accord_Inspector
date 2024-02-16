@@ -23,94 +23,126 @@
         
         <!-- Top Viewer -->
         <Border Grid.Column="0" Margin="0,0,5,0" BorderBrush="DarkGray" BorderThickness="2">
-            <Grid>
-                <Grid Panel.ZIndex="2" Width="140" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left" Background="DarkGray" Opacity="0.8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Label Grid.Row="0" Grid.ColumnSpan="2" Margin="3"
+            <Border>
+                <Border.Style>
+                    <Style>
+                        <Setter Property="Border.Visibility" Value="Visible"/>
+                        <Setter Property="Border.BorderThickness" Value="10"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding TopIsPass}" Value="true">
+                                <Setter Property="Border.BorderBrush" Value="#9EF048"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding TopIsPass}" Value="false">
+                                <Setter Property="Border.BorderBrush" Value="#F44848"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Grid>
+                    <Grid Panel.ZIndex="2" Width="140" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left" Background="DarkGray" Opacity="0.8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Grid.ColumnSpan="2" Margin="3"
                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                            Background="#333333" Foreground="#9EF048" FontWeight="Bold" FontSize="18"
                            Content="상부"/>
-                    <!-- Box Count -->
-                    <Label Grid.Row="1" Grid.Column="0" Margin="3"
+                        <!-- Box Count -->
+                        <Label Grid.Row="1" Grid.Column="0" Margin="3"
                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                            Background="#333333" Foreground="#9EF048" FontSize="14"
                            Content="Box"/>
-                    <Label Grid.Row="1" Grid.Column="1" Margin="3"
+                        <Label Grid.Row="1" Grid.Column="1" Margin="3"
                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                            Background="#333333" Foreground="#9EF048" FontSize="14"
                            Content="{Binding TopBoxCount}"/>
-                    <!-- Barcode Count -->
-                    <Label Grid.Row="2" Grid.Column="0" Margin="3"
+                        <!-- Barcode Count -->
+                        <Label Grid.Row="2" Grid.Column="0" Margin="3"
                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                            Background="#333333" Foreground="#9EF048" FontSize="14"
                            Content="Barcode"/>
-                    <Label Grid.Row="2" Grid.Column="1" Margin="3"
+                        <Label Grid.Row="2" Grid.Column="1" Margin="3"
                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                            Background="#333333" Foreground="#9EF048" FontSize="14"
                            Content="{Binding TopBarcodeCount}"/>
-                </Grid> 
-                
-                <!-- Image -->
-                <Image Panel.ZIndex="1" Source="{Binding TopOverlayImg}"/>
-                <StackPanel Orientation="Horizontal" Panel.ZIndex="2" VerticalAlignment="Bottom" HorizontalAlignment="Left">
-                    <TextBlock Text="Count : "/>
-                    <TextBlock Text="{Binding TopCount}"/>
-                </StackPanel>
-            </Grid>
+                    </Grid>
+
+                    <!-- Image -->
+                    <Image Panel.ZIndex="1" Source="{Binding TopOverlayImg}"/>
+                    <StackPanel Orientation="Horizontal" Panel.ZIndex="2" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                        <TextBlock Text="Count : "/>
+                        <TextBlock Text="{Binding TopCount}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Border>
         
         <!-- Bottom Viewer -->
         <Border Grid.Column="1" Margin="5,0,0,0" BorderBrush="DarkGray" BorderThickness="2">
-            <Grid>
-                <Grid Panel.ZIndex="2" Width="140" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left" Background="DarkGray" Opacity="0.8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Label Grid.Row="0" Grid.ColumnSpan="2" Margin="3"
+            <Border>
+                <Border.Style>
+                    <Style>
+                        <Setter Property="Border.Visibility" Value="Visible"/>
+                        <Setter Property="Border.BorderThickness" Value="10"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding BotIsPass}" Value="true">
+                                <Setter Property="Border.BorderBrush" Value="#9EF048"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding BotIsPass}" Value="false">
+                                <Setter Property="Border.BorderBrush" Value="#F44848"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Grid>
+                    <Grid Panel.ZIndex="2" Width="140" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left" Background="DarkGray" Opacity="0.8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Grid.ColumnSpan="2" Margin="3"
                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                            Background="#333333" Foreground="#9EF048" FontWeight="Bold" FontSize="18"
                            Content="하부"/>
-                    <!-- Box Count -->
-                    <Label Grid.Row="1" Grid.Column="0" Margin="3"
+                        <!-- Box Count -->
+                        <Label Grid.Row="1" Grid.Column="0" Margin="3"
                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                            Background="#333333" Foreground="#9EF048" FontSize="14"
                            Content="Box"/>
-                    <Label Grid.Row="1" Grid.Column="1" Margin="3"
+                        <Label Grid.Row="1" Grid.Column="1" Margin="3"
                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                            Background="#333333" Foreground="#9EF048" FontSize="14"
                            Content="{Binding BottomBoxCount}"/>
-                    <!-- Barcode Count -->
-                    <Label Grid.Row="2" Grid.Column="0" Margin="3"
+                        <!-- Barcode Count -->
+                        <Label Grid.Row="2" Grid.Column="0" Margin="3"
                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                            Background="#333333" Foreground="#9EF048" FontSize="14"
                            Content="Barcode"/>
-                    <Label Grid.Row="2" Grid.Column="1" Margin="3"
+                        <Label Grid.Row="2" Grid.Column="1" Margin="3"
                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                            Background="#333333" Foreground="#9EF048" FontSize="14"
                            Content="{Binding BottomBarcodeCount}"/>
+                    </Grid>
+                    <!-- Image -->
+                    <Image Panel.ZIndex="1" Source="{Binding BottomOverlayImg}"/>
+
+                    <StackPanel Orientation="Horizontal" Panel.ZIndex="2" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                        <TextBlock Text="Count : "/>
+                        <TextBlock Text="{Binding BotCount}"/>
+                    </StackPanel>
                 </Grid>
-                <!-- Image -->
-                <Image Panel.ZIndex="1" Source="{Binding BottomOverlayImg}"/>
-                
-                <StackPanel Orientation="Horizontal" Panel.ZIndex="2" VerticalAlignment="Bottom" HorizontalAlignment="Left">
-                    <TextBlock Text="Count : "/>
-                    <TextBlock Text="{Binding BotCount}"/>
-                </StackPanel>
-            </Grid>
+            </Border>
         </Border>
     </Grid>
 </UserControl>

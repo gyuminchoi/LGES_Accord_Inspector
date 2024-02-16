@@ -21,6 +21,7 @@ namespace Service.Database.Services
         void DeleteTable();
         void InsertData(RecordData data);
         DataTable Search(string parcelBarcode, string productBarcode, DateTime startTime, DateTime endTime);
+        int SearchCount(string parcelBarcode, string productBarcode, DateTime startTime, DateTime endTime);
         void ExportCSV(DataTable dt);
     }
 }

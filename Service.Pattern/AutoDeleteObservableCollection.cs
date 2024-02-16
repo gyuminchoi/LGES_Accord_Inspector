@@ -14,7 +14,6 @@ namespace Service.Pattern
         /// Default 20
         /// </summary>
         public int MaxIndex { get; set; } = 20;
-
         public AutoDeleteObservableCollection() { }
         public AutoDeleteObservableCollection(int maxIndex) => MaxIndex = maxIndex;
 

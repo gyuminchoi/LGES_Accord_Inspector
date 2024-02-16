@@ -14,6 +14,7 @@ namespace Service.VisionPro.Models
         public double Y { get; set; }
         public string Code { get; set; }
 
+        public Barcode() { }
         public Barcode(double x, double y, string code)
         {
             X = x;

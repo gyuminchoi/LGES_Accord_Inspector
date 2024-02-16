@@ -8,10 +8,11 @@ using Prism.Mvvm;
 using Service.Camera.Models;
 using Service.Camera.Services;
 using Service.ConnectionCheck.Services;
-using Service.Database.Models;
 using Service.Database.Services;
+using Service.Delete.Services;
 using Service.IO.Services;
 using Service.Logger.Services;
+using Service.MainInspection.Services;
 using Service.Postprocessing.Services;
 using Service.Save.Services;
 using Service.Setting.Services;
@@ -49,6 +50,7 @@ namespace BarcodeLabel.Main.Services.Bootstrappers
             containerRegistry.RegisterSingleton<IConnectionCheckManager, ConnectionCheckManager>();
             containerRegistry.RegisterSingleton<ISQLiteManager,SQLiteManager>();
             containerRegistry.RegisterSingleton<ISaveManager, SaveManager>();
+            containerRegistry.RegisterSingleton<IMainInpectionManager, MainInspectionManager>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
@@ -133,8 +135,18 @@ namespace BarcodeLabel.Main.Services.Bootstrappers
             eventAggregator.GetEvent<ServicesInitCompleteEvent>().Publish();
 
             ISaveManager saveManager = Container.Resolve<ISaveManager>();
-            saveManager.Initialize(settingManager, ppManager, sqliteManager);
+            saveManager.Initialize(settingManager, vpManager, sqliteManager);
             _logWrite.Info("Initialize Save Manager Complete!");
+
+            IMainInpectionManager miManager = Container.Resolve<IMainInpectionManager>();
+            miManager.Initialize(camManager, imManager, vpManager, ppManager, saveManager);
+            _logWrite.Info("Initialize main inspection manager!");
+
+            // 오래된 데이터 삭제
+            DirectoryDeleteService dirDeleteService = DirectoryDeleteService.Instance;
+            dirDeleteService.Initialize(settingManager);
+            dirDeleteService.DeleteOldFolder();
+
             sc.Close(TimeSpan.Zero);
         }
 

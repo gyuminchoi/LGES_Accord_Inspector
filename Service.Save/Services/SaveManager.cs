@@ -1,4 +1,5 @@
-﻿using Service.Database.Models;
+﻿using Service.Camera.Services.ConvertService;
+using Service.Database.Models;
 using Service.Database.Services;
 using Service.Logger.Services;
 using Service.Postprocessing.Models;
@@ -6,12 +7,16 @@ using Service.Postprocessing.Services;
 using Service.Setting.Models;
 using Service.Setting.Services;
 using Service.VisionPro.Models;
+using Service.VisionPro.Services;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Threading;
 using Encoder = System.Drawing.Imaging.Encoder;
 
@@ -21,39 +26,71 @@ namespace Service.Save.Services
     {
         private LogWrite _logWrite = LogWrite.Instance;
         private ISettingManager _settingManager;
-        private IPostprocessingManager _ppManager;
+        private IVisionProManager _vpManager;
         private ISQLiteManager _sqliteManager;
-        public SaveManager() { }
-
-        public void Initialize(ISettingManager settingManager, IPostprocessingManager ppManager, ISQLiteManager sqliteManager)
+        private BitmapConverter _bmpConverter = new BitmapConverter();
+        private Thread _saveThread = new Thread(() => { });
+        private AutoResetEvent _saveDataSyncEvent = new AutoResetEvent(false);
+        public ConcurrentQueue<VisionProResult> SaveQueue { get; set; } = new ConcurrentQueue<VisionProResult>();
+        public bool IsRun { get; set; } = false;
+        public void Initialize(ISettingManager sm, IVisionProManager vpm, ISQLiteManager sqliteManager)
         {
-            _settingManager = settingManager;
-            _ppManager = ppManager;
+            _settingManager = sm;
+            _vpManager = vpm;
             _sqliteManager = sqliteManager;
         }
 
         public void Start()
         {
-            if (_ppManager.ProcessorDic.Count > 0)
+            if (SaveQueue.Count > 0)
             {
-                foreach (var processor in _ppManager.ProcessorDic.Values)
+                for (int i = 0; i < SaveQueue.Count; i++)
                 {
-                    //TODO :Test
-                    processor.PostprocessComplete += OnSaveInspectData2;
+                    SaveQueue.TryDequeue(out VisionProResult result);
+                    result.Dispose();
                 }
             }
+
+            IsRun = true;
+
+            _saveThread = new Thread(new ThreadStart(SaveProcess));
+            _saveThread.Name = "Save Thread";
+            _saveThread.Start();
         }
 
         public void Stop()
         {
-            if (_ppManager.ProcessorDic.Count > 0)
+            try
             {
-                foreach (var processor in _ppManager.ProcessorDic.Values)
+                if (!_saveThread.IsAlive)
+                    return;
+
+                IsRun = false;
+
+                if (_saveThread.Join(1000))
+                    _saveThread.Abort();
+
+                if (SaveQueue.Count > 0)
                 {
-                    //TODO: Test
-                    processor.PostprocessComplete -= OnSaveInspectData2;
+                    for (int i = 0; i < SaveQueue.Count; i++)
+                    {
+                        SaveQueue.TryDequeue(out VisionProResult result);
+                        result.Dispose();
+                    }
                 }
             }
+            catch (Exception err)
+            {
+                _logWrite?.Error(err);
+            }
+        }
+
+        public void DataSave(VisionProResult result)
+        {
+            string settingPath = _settingManager.AppSetting.ImageSetting.InspectionImageSavePath;
+            string directory = SetDirectory(settingPath, result.InspectionTime);
+            Directory.CreateDirectory(directory);
+            Save(result, directory, _settingManager.AppSetting.ImageSetting);
         }
 
         public void Dispose()
@@ -68,31 +105,26 @@ namespace Service.Save.Services
             }
         }
 
-        private void OnSaveInspectData(PostprocessingResult result)
+        private void SaveProcess()
         {
-            string settingPath = _settingManager.AppSetting.ImageSetting.InspectionImageSavePath;
-            string directory = SetDirectory(settingPath, result.VisionProResult.InspectionTime);
-            Directory.CreateDirectory(directory);
-            Save(result, directory, _settingManager.AppSetting.ImageSetting);
-        }
-
-        //TODO : Test
-        private void OnSaveInspectData2(PostprocessingResult result)
-        {
-            ThreadPool.QueueUserWorkItem(ImageSaveProcess, result);
-        }
-
-        private void ImageSaveProcess(object result)
-        {
-            PostprocessingResult ppResult = (PostprocessingResult)result;
             Stopwatch sw = new Stopwatch();
-            sw.Start();
-            string settingPath = _settingManager.AppSetting.ImageSetting.InspectionImageSavePath;
-            string directory = SetDirectory(settingPath, ppResult.VisionProResult.InspectionTime);
-            Directory.CreateDirectory(directory);
-            Save2(ppResult, directory, _settingManager.AppSetting.ImageSetting);
-            sw.Stop();
-            _logWrite.Info("Save : " + sw.ElapsedMilliseconds.ToString());
+            while (IsRun)
+            {
+
+                if(!SaveQueue.TryDequeue(out VisionProResult result))
+                {
+                    Thread.Sleep(10);
+                    continue;
+                }
+                sw.Restart();
+
+                DataSave(result);
+
+                result.Dispose();
+
+                sw.Stop();
+                _logWrite?.Info($"Data Save Complete!!, Processing time : {sw.ElapsedMilliseconds}", false, false);
+            }
         }
 
         private string SetDirectory(string rootDirectory, DateTime dt)
@@ -102,71 +134,56 @@ namespace Service.Save.Services
             return saveDirectory;
         }
 
-        private void Save(PostprocessingResult ppResult, string path, ImageSetting setting)
+        private void Save(VisionProResult result, string directoryPath, ImageSetting setting)
         {
-            foreach (var boxData in ppResult.VisionProResult.BoxDatas)
-            {
-                string filePath = SetFilePath(boxData, setting, path);
-
-                // Image Save
-                if (setting.IsCompression.Value) 
-                    ImageSaveAsJpg(filePath, boxData.CropBmp, 80L);
-                else 
-                    boxData.CropBmp.Save(filePath, ImageFormat.Bmp);
-
-                // Insert DB Table 
-                string parcelCode = boxData.Barcodes.First().Code;
-                string productCode = boxData.Barcodes.Last().Code;
-
-                _sqliteManager.InsertData(new RecordData(ppResult.VisionProResult.InspectionTime, parcelCode, productCode, filePath));
-            }
-
-            ppResult.Dispose();
-        }
-
-        //TODO : Test
-        private void Save2(PostprocessingResult ppResult, string path, ImageSetting setting)
-        {
-            string filePath = string.Empty;
+            string filePath = null;
+            Stopwatch sw = new Stopwatch();
             try
             {
-                int parcel = 0;
-                int product = 0;
-                foreach (var boxData in ppResult.VisionProResult.BoxDatas)
+                foreach (var boxData in result.BoxDatas)
                 {
-                    filePath = SetFilePath2(boxData, setting, path, parcel.ToString(), product.ToString());
+                    filePath = SetFilePath(boxData, setting, directoryPath);
 
                     // Image Save
                     if (setting.IsCompression.Value)
+                    {
+                        sw.Restart();
                         ImageSaveAsJpg(filePath, boxData.CropBmp, 80L);
+                        sw.Stop();
+                        _logWrite?.Info($"Compression Save Processing time : {sw.ElapsedMilliseconds}", false, false);
+                    }
                     else
-                        boxData.CropBmp.Save(filePath, ImageFormat.Bmp);
+                    {
+                        //TODO : Test Code
+                        sw.Restart();
+                        Bitmap bmp = _bmpConverter.Get8GrayBitmap(boxData.CropBmp);
+                        sw.Stop();
+                        _logWrite?.Info($"24Bit -> 8Bit, Processing time : {sw.ElapsedMilliseconds}", false, false);
 
-                    // Insert DB Table
-                    _sqliteManager.InsertData(new RecordData(ppResult.VisionProResult.InspectionTime, parcel.ToString(), product.ToString(), filePath));
-                    parcel++;
-                    product++;
+                        sw.Restart();
+                        bmp.Save(filePath, ImageFormat.Bmp);
+                        sw.Stop();
+                        _logWrite?.Info($"Bitmap Save, Processing time : {sw.ElapsedMilliseconds}", false, false);
+                        bmp.Dispose();
+                    }
+
+                    // 데이터 정렬
+                    string parcelCode = boxData.Barcodes.First().Code;
+                    string productCode = boxData.Barcodes.Last().Code;
+
+                    // Insert DB Table 
+                    sw.Restart();
+                    _sqliteManager.InsertData(new RecordData(result.InspectionTime, parcelCode, productCode, filePath));
+                    sw.Stop();
+                    _logWrite?.Info($"DB Insert, Processing time : {sw.ElapsedMilliseconds}", false, false);
                 }
-
-                ppResult.Dispose();
             }
             catch (Exception err)
             {
-                _logWrite.Error(err,false,true);
-                _logWrite.Info(filePath, false, false);
+                _logWrite?.Info(filePath);
+                _logWrite?.Error(err);
             }
             
-        }
-        //TODO :test
-        private string SetFilePath2(Box boxData, ImageSetting setting, string directoryPath,string parcel,string product)
-        {
-            string extension = null;
-            if (setting.IsCompression.Value) extension = ".jpg";
-            else extension = ".bmp";
-
-            string fileName = $"{parcel}_{product}{extension}";
-            string filePath = Path.Combine(directoryPath, fileName);
-            return filePath;
         }
 
         private string SetFilePath(Box boxData, ImageSetting setting, string directoryPath)
@@ -186,7 +203,7 @@ namespace Service.Save.Services
 
         private string DateTimeToPath(DateTime dt)
         {
-            string dateStr = dt.ToString("yyyy_MM_dd");
+            string dateStr = dt.ToString("yyyy-MM-dd");
             string timeStr = dt.ToString("HH_mm_ss_fff");
 
             string path = Path.Combine(dateStr, timeStr);

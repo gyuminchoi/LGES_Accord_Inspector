@@ -18,8 +18,14 @@ namespace Service.Drawing.Services
         //    }
         //}
 
-        
-        public Bitmap DrawRectangles(Bitmap bmp, string color, int penSize, List<RectangleF> rectList)
+        /// <summary>
+        /// 매개변수 bmp에 Rect를 그림
+        /// </summary>
+        /// <param name="bmp"></param>
+        /// <param name="color"></param>
+        /// <param name="penSize"></param>
+        /// <param name="rectList"></param>
+        public void DrawRectangles(Bitmap bmp, string color, int penSize, List<RectangleF> rectList)
         {
             RectangleF[] rectArr = rectList.ToArray();
 
@@ -31,7 +37,6 @@ namespace Service.Drawing.Services
                 {
                     g.DrawRectangles(pen, rectArr);
                 }
-                return bmp;
             }
         }
     }

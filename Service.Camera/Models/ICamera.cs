@@ -11,6 +11,7 @@ namespace Service.Camera.Models
     public interface ICamera : IDisposable
     { 
         CameraConfig CamConfig { get; set; }
+        bool IsEnqueue { get; set; }
         ConcurrentQueue<byte[]> RawDatas { get; set; }
         event EventHandler<string> ReceiveRawDataEnqueueComplete;
         //ConcurrentQueue<Bitmap> ReceiveImageDatas { get; set; }

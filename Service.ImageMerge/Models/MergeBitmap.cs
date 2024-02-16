@@ -15,12 +15,11 @@ namespace Service.ImageMerge.Models
 
         public void Dispose()
         {
-            if (Bmp != null) Bmp.Dispose();
             if (PImage != IntPtr.Zero)
             {
                 Marshal.FreeHGlobal(PImage);
-                PImage = IntPtr.Zero;
             }
+            if (Bmp != null) Bmp.Dispose();
         }
     }
 }
