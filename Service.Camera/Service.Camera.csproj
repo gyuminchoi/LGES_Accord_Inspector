@@ -90,10 +90,6 @@
       <Project>{7cda4a51-de38-4ddd-bf00-53c9eafa72ad}</Project>
       <Name>Service.Pattern</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Service.Setting\Service.Setting.csproj">
-      <Project>{F2BDFF7C-F3BD-4AA8-9C93-8F118C6EA039}</Project>
-      <Name>Service.Setting</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

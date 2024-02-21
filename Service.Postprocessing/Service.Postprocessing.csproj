@@ -73,6 +73,10 @@
       <Project>{17F19850-AC0F-4D11-ADA7-9809837BE78B}</Project>
       <Name>Service.Camera</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Service.DeepLearning\Service.DeepLearning.csproj">
+      <Project>{7E167001-57CE-4274-9D6E-1A9DFAEFA9CD}</Project>
+      <Name>Service.DeepLearning</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Service.Drawing\Service.Drawing.csproj">
       <Project>{320d746d-2e95-4b08-a758-fdddaec98198}</Project>
       <Name>Service.Drawing</Name>
@@ -85,12 +89,8 @@
       <Project>{7cda4a51-de38-4ddd-bf00-53c9eafa72ad}</Project>
       <Name>Service.Pattern</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Service.Setting\Service.Setting.csproj">
-      <Project>{f2bdff7c-f3bd-4aa8-9c93-8f118c6ea039}</Project>
-      <Name>Service.Setting</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Service.VisionPro\Service.VisionPro.csproj">
-      <Project>{6e66ebdc-e859-4f69-b72b-b445e41be3f7}</Project>
+      <Project>{6E66EBDC-E859-4F69-B72B-B445E41BE3F7}</Project>
       <Name>Service.VisionPro</Name>
     </ProjectReference>
   </ItemGroup>

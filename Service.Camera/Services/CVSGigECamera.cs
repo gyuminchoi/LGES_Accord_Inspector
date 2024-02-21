@@ -1,4 +1,4 @@
-﻿  using Crevis.VirtualFG40Library;
+﻿using Crevis.VirtualFG40Library;
 using Service.Camera.Models;
 using Service.Camera.Services.ConvertService;
 using Service.CustomException.Models.ErrorTypes;
@@ -7,14 +7,11 @@ using Service.Logger.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Service.Camera.Services
 {
@@ -27,21 +24,20 @@ namespace Service.Camera.Services
         private BitmapConverter _bmpConverter = BitmapConverter.Instance;
         private LogWrite _logWrite = LogWrite.Instance;
         private object _rawDatasLock = new object();
-        //private Thread _imgDataThread = new Thread(new ThreadStart(() => { }));
+        private Thread _imgDataThread = new Thread(new ThreadStart(() => { }));
         private Thread _reconnectThread = new Thread(new ThreadStart(() => { }));
         private AutoResetEvent _imgCallbackOnEvent = new AutoResetEvent(false);
         private bool _isDoingStop = false;
         private object _stoppingLock = new object();
         private bool _isSWTrigThread = false;
         private Thread _swTrigThread = new Thread(() => { });
-        public CameraConfig CamConfig { get; set; }
-        public ConcurrentQueue<byte[]> RawDatas { get; set; } = new ConcurrentQueue<byte[]>();
-        //public ConcurrentQueue<Bitmap> ReceiveImageDatas { get; set; } = new ConcurrentQueue<Bitmap>();
-        public int MaxEnqueueCount { get; set; } = 1000;
-        public bool IsEnqueue { get; set; } = false;
 
-        //public event EventHandler<string> ReceiveImageDataEnqueueComplete;
-        public event EventHandler<string> ReceiveRawDataEnqueueComplete;
+        public CameraConfig CamConfig { get; set; }
+        private Queue<byte[]> _rawDatas { get; set; } = new Queue<byte[]>();
+        public ConcurrentQueue<Bitmap> ReceiveImageDatas { get; set; } = new ConcurrentQueue<Bitmap>();
+        public int MaxEnqueueCount { get; set; } = 100;
+
+        public event EventHandler<string> ReceiveImageDataEnqueueComplete;
         public CVSGigECamera(VirtualFG40Library vfg, uint camIndex, string userID, string modelName, string serialNumber, string deviceVersion)
         {
             _vfg = vfg;
@@ -83,21 +79,8 @@ namespace Service.Camera.Services
                 UpdateCameraDatas();
             }
 
-            //TODO : TriggerMode Test
-            SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_USER_SET_SELECTOR, VirtualFG40Library.USER_SET_SELECTOR_USER_SET_2);
+            SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_USER_SET_SELECTOR, VirtualFG40Library.USER_SET_SELECTOR_USER_SET_3);
             SetParameter(ECameraGetSetType.VFGCmd, VirtualFG40Library.MCAM_USER_SET_LOAD, null);
-            //SetParameter(ECameraGetSetType.VFGInt, VirtualFG40Library.GEV_SCPS_PACKETSIZE, 8192);
-            //SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_TRIGGER_MODE, VirtualFG40Library.TRIGGER_MODE_ON);
-            //SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_TRIGGER_SOURCE, VirtualFG40Library.TRIGGER_SOURCE_SOFTWARE);
-            //SetParameter(ECameraGetSetType.VFGEnum, VirtualFG40Library.MCAM_PIXEL_FORMAT, VirtualFG40Library.PIXEL_FORMAT_MONO8);
-            //SetParameter(ECameraGetSetType.VFGInt, VirtualFG40Library.MCAM_OFFSET_X, 0);
-            //SetParameter(ECameraGetSetType.VFGInt, VirtualFG40Library.MCAM_OFFSET_Y, 0);
-            //int width = 0;
-            //_vfg.GetIntReg(CamConfig.HDevice, VirtualFG40Library.MCAM_WIDTH_MAX, ref width);
-            //SetParameter(ECameraGetSetType.VFGInt, VirtualFG40Library.MCAM_WIDTH, width);
-            //int height = 0;
-            //_vfg.GetIntReg(CamConfig.HDevice, VirtualFG40Library.MCAM_HEIGHT_MAX, ref height);
-            //SetParameter(ECameraGetSetType.VFGInt, VirtualFG40Library.MCAM_HEIGHT, height);
             CamConfig.CamState = ECameraState.Opened;
             CamConfig.IsOpen = true;
         }
@@ -146,7 +129,8 @@ namespace Service.Camera.Services
                     CamConfig.Stride = (Int32)((CamConfig.Width * 8 + 7) / 8);
                     CamConfig.BitmapPixelFormat = PixelFormat.Format8bppIndexed;
                     CamConfig.IsNeedGrayScale = true;
-                    break; ;
+                    break;
+
                 case "BayerRG8":
                     CamConfig.Buffersize = CamConfig.Width * CamConfig.Height;
                     CamConfig.Stride = (Int32)((CamConfig.Width * 24 + 7) / 8);
@@ -203,33 +187,33 @@ namespace Service.Camera.Services
         {
             _logWrite?.Info($"({CamConfig.UserID}) Crevis GigE Camera. GrabStart.");
 
-            //if (_imgDataThread.IsAlive)
-            //{
-            //    _imgDataThread.Abort();
-            //    // 5초안에 안죽으면 에러.
-            //    if (!_imgDataThread.Join(5000))
-            //    {
-            //        CamConfig.CamState = ECameraState.Error;
-            //        throw new ThreadException(EThreadError.DoesntDie, _imgDataThread.Name);
-            //    }
-            //}
+            if (_imgDataThread.IsAlive)
+            {
+                _imgDataThread.Abort();
+                // 5초안에 안죽으면 에러.
+                if (!_imgDataThread.Join(5000))
+                {
+                    CamConfig.CamState = ECameraState.Error;
+                    throw new ThreadException(EThreadError.DoesntDie, _imgDataThread.Name);
+                }
+            }
 
             lock (_rawDatasLock)
             {
-                for (int i = 0; i < RawDatas.Count; i++)
+                for (int i = 0; i < _rawDatas.Count; i++)
                 {
-                    RawDatas.TryDequeue(out _);
+                    _ = _rawDatas.Dequeue();
                 }
             }
-            
-            //while (ReceiveImageDatas.TryDequeue(out Bitmap reData)) { reData.Dispose(); }
+
+            while (ReceiveImageDatas.TryDequeue(out Bitmap reData)) { reData.Dispose(); }
 
             CamConfig.CamState = ECameraState.GrabStart;
             CamConfig.IsGrabStart = true;
             _isDoingStop = false;
 
-            //_imgDataThread = new Thread(new ThreadStart(ImageProcess)) { Name = $"CVSGigE_ImageProcessThread({CamConfig.UserID})" };
-            //_imgDataThread.Start();
+            _imgDataThread = new Thread(new ThreadStart(ImageProcess)) { Name = $"CVSGigE_ImageProcessThread({CamConfig.UserID})" };
+            _imgDataThread.Start();
         }
 
         public void GrabStop()
@@ -240,9 +224,9 @@ namespace Service.Camera.Services
 
             lock (_rawDatasLock)
             {
-                for (int i = 0; i < RawDatas.Count; i++)
+                for (int i = 0; i < _rawDatas.Count; i++)
                 {
-                    RawDatas.TryDequeue(out _);
+                    _ = _rawDatas.Dequeue();
                 }
             }
         }
@@ -269,18 +253,19 @@ namespace Service.Camera.Services
             }
         }
 
-        public void ContinueSWTrigExecute()
+        public void ContinueSWTrigExecute(object cyleTime)
         {
             _isSWTrigThread = true;
 
-            _swTrigThread = new Thread(new ThreadStart(TrigExecuteProcess));
-            _swTrigThread.Name = "LiveCam Thread";
-            _swTrigThread.Start();
+            _swTrigThread = new Thread(new ParameterizedThreadStart(TrigExecuteProcess));
+            _swTrigThread.Name = "SW Trigger Thread";
+            _swTrigThread.Start(cyleTime);
         }
 
-        private void TrigExecuteProcess()
+        private void TrigExecuteProcess(object cycleTime)
         {
             int errCount = 0;
+            int threadCycle = (int)cycleTime;
             try
             {
                 while (_isSWTrigThread)
@@ -289,18 +274,20 @@ namespace Service.Camera.Services
                     {
                         int errCode = _vfg.SetCmdReg(CamConfig.HDevice, VirtualFG40Library.MCAM_TRIGGER_SOFTWARE);
                         if (errCode != VirtualFG40Library.MCAM_ERR_SUCCESS)
-                            errCount++;
+                        {
+                            throw new Exception($"SW Trigger thred err!! error code : {errCode}");
+                        }
 
-                        Thread.Sleep(3000);
+                        Thread.Sleep(threadCycle);
                     }
                     catch (Exception err)
                     {
-                        _logWrite.Error(err, false, true);
+                        _logWrite.Error(err, false, false);
 
                         if (errCount > 100)
                         {
                             CamConfig.CamState = ECameraState.Error;
-                            throw new Exception("LiveCam thread die");
+                            throw new Exception("SW trigger thread die");
                         }
 
                         errCount++;
@@ -495,7 +482,7 @@ namespace Service.Camera.Services
                     return 0;
 
                 // Queue에 너무 많이 쌓였다면 에러 발생
-                if (RawDatas.Count > MaxEnqueueCount)
+                if (_rawDatas.Count > MaxEnqueueCount)
                 {
                     lock (_stoppingLock)
                     {
@@ -530,11 +517,10 @@ namespace Service.Camera.Services
 
             lock (_rawDatasLock)
             {
-                RawDatas.Enqueue(arrImg);
+                _rawDatas.Enqueue(arrImg);
             }
 
-            ReceiveRawDataEnqueueComplete?.Invoke(this, CamConfig.UserID);
-            //_imgCallbackOnEvent.Set();
+            _imgCallbackOnEvent.Set();
         }
 
         /// <summary>
@@ -611,84 +597,86 @@ namespace Service.Camera.Services
             }
         }
 
-        //public void ImageProcess()
-        //{
-        //    try
-        //    {
-        //        while (CamConfig.IsGrabStart)
-        //        {
-        //            try
-        //            {
-        //                if (RawDatas.Count > 0)
-        //                {
-        //                    // Queue에 너무 많이 쌓였다면 에러 발생.
-        //                    if (ReceiveImageDatas.Count > MaxEnqueueCount)
-        //                    {
-        //                        AcqStop();
-        //                        GrabStop();
-        //                        CamConfig.CamState = ECameraState.Error;
-        //                        throw new CVSCameraException(null, ECameraError.CallbackQueueIsFull, $"({CamConfig.UserID})");
-        //                    }
+        public void ImageProcess()
+        {
+            try
+            {
+                BitmapData bmpData = new BitmapData();
+                bmpData.Stride = CamConfig.Stride;
+                bmpData.Height = CamConfig.Height;
+                bmpData.Width = CamConfig.Width;
+                bmpData.PixelFormat = CamConfig.BitmapPixelFormat;
 
-        //                    DateTime dt = DateTime.Now;
+                while (CamConfig.IsGrabStart)
+                {
+                    try
+                    {
+                        if (_rawDatas.Count > 0)
+                        {
+                            // Queue에 너무 많이 쌓였다면 에러 발생.
+                            if (ReceiveImageDatas.Count > MaxEnqueueCount)
+                            {
+                                AcqStop();
+                                GrabStop();
+                                CamConfig.CamState = ECameraState.Error;
+                                throw new CVSCameraException(null, ECameraError.CallbackQueueIsFull, $"({CamConfig.UserID})");
+                            }
 
-        //                    byte[] rawImg;
-        //                    lock (_rawDatasLock)
-        //                    {
-        //                        RawDatas.TryDequeue(out rawImg);
-        //                    }
+                            //DateTime dt = DateTime.Now;
 
-        //                    //IntPtr ptr = IntPtr.Zero;
-        //                    //Marshal.Copy(rawImg, 0, ptr, rawImg.Length);
-        //                    BitmapData bmpData = new BitmapData();
-        //                    bmpData.Stride = CamConfig.Stride;
-        //                    bmpData.Height = CamConfig.Height;
-        //                    bmpData.Width = CamConfig.Width;
-        //                    bmpData.PixelFormat = CamConfig.BitmapPixelFormat;
+                            byte[] rawImg;
+                            lock (_rawDatasLock)
+                            {
+                                rawImg = _rawDatas.Dequeue();
+                            }
 
-        //                    Bitmap bmp;
-        //                    switch (CamConfig.VfgPixelFormat)
-        //                    {
-        //                        case "Mono8":
-        //                            bmp = _bmpConverter.ByteArrayToBitmap(bmpData, rawImg, CamConfig.BitmapPixelFormat);
-        //                            break;
+                            //IntPtr ptr = IntPtr.Zero;
+                            //Marshal.Copy(rawImg, 0, ptr, rawImg.Length);
+                            
 
-        //                        //case "BayerRG8":
-        //                        //    IntPtr cvtPtr = IntPtr.Zero;
-        //                        //    cvtPtr = Marshal.AllocHGlobal(CamConfig.Buffersize * 3);
-        //                        //    _vfg.CvtColor(ptr, cvtPtr, CamConfig.Width, CamConfig.Height, VirtualFG40Library.CV_BayerRG2RGB);
-        //                        //    bmp = _bmpConverter.IntPtrToBitmap(CamConfig, ptr);
-        //                        //    Marshal.FreeHGlobal(ptr);
-        //                        //    break;
-        //                        default:
-        //                            throw new CVSCameraException(null, ECameraError.UnimplementedPixelFormat, $"({CamConfig.UserID}), (PixelFormat = {CamConfig.VfgPixelFormat})");
-        //                    }
+                            Bitmap bmp;
+                            switch (CamConfig.VfgPixelFormat)
+                            {
+                                case "Mono8":
+                                    bmp = _bmpConverter.ByteArrayToBitmap(bmpData, rawImg, CamConfig.BitmapPixelFormat);
+                                    break;
 
-        //                    ReceiveImageDatas.Enqueue(bmp);
+                                //case "BayerRG8":
+                                //    IntPtr cvtPtr = IntPtr.Zero;
+                                //    cvtPtr = Marshal.AllocHGlobal(CamConfig.Buffersize * 3);
+                                //    _vfg.CvtColor(ptr, cvtPtr, CamConfig.Width, CamConfig.Height, VirtualFG40Library.CV_BayerRG2RGB);
+                                //    bmp = _bmpConverter.IntPtrToBitmap(CamConfig, ptr);
+                                //    Marshal.FreeHGlobal(ptr);
+                                //    break;
+                                default:
+                                    throw new CVSCameraException(null, ECameraError.UnimplementedPixelFormat, $"({CamConfig.UserID}), (PixelFormat = {CamConfig.VfgPixelFormat})");
+                            }
 
-        //                    // 누군가 구독했다면 완료 이벤트 발생.
-        //                    ReceiveImageDataEnqueueComplete?.Invoke(this, CamConfig.UserID);
-        //                }
-        //                else
-        //                {
-        //                    _imgCallbackOnEvent.WaitOne(2000);
-        //                    //TODO : 여기서 리트라이 기능 구현하면 될 듯
-        //                }
-        //            }
-        //            catch (ThreadAbortException) { throw; }
-        //            catch (CVSCameraException ex) { _logWrite?.Error(ex, false, true); }
-        //            catch (Exception ex) { _logWrite?.Error(ex, true, true); }
-        //        }
-        //    }
-        //    catch (ThreadAbortException) 
-        //    {
-        //        CamConfig.CamState = ECameraState.Error;
-        //    }
-        //    finally
-        //    {
-        //        CamConfig.IsGrabStart = false;
-        //    }
-        //}
+                            ReceiveImageDatas.Enqueue(bmp);
+
+                            // 누군가 구독했다면 완료 이벤트 발생.
+                            ReceiveImageDataEnqueueComplete?.Invoke(this, CamConfig.UserID);
+                        }
+                        else
+                        {
+                            _imgCallbackOnEvent.WaitOne(2000);
+                            //TODO : 여기서 리트라이 기능 구현하면 될 듯
+                        }
+                    }
+                    catch (ThreadAbortException) { throw; }
+                    catch (CVSCameraException ex) { _logWrite?.Error(ex, false, true); }
+                    catch (Exception ex) { _logWrite?.Error(ex, true, true); }
+                }
+            }
+            catch (ThreadAbortException)
+            {
+                CamConfig.CamState = ECameraState.Error;
+            }
+            finally
+            {
+                CamConfig.IsGrabStart = false;
+            }
+        }
 
         private void GCHandleFree()
         {

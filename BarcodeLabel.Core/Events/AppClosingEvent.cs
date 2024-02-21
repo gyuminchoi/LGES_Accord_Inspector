@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BarcodeLabel.Core.Events
+namespace CREVIS_SWIR_Inspector.Core.Events
 {
     public class AppClosingEvent : PubSubEvent { }
 }

@@ -9,19 +9,11 @@ namespace Service.Setting.Models
 {
     public class AppSetting : BindableBase
     {
-        private ImageSetting _imageSetting;
         private GeneralSetting _generalSetting;
-        private DataSetting _dataSetting;
-        private IOSetting _ioSetting;
         private VisionProSetting _visionProSetting;
-        private DataBaseSetting _dataBaseSetting;
-
-        public ImageSetting ImageSetting { get => _imageSetting; set => SetProperty(ref _imageSetting, value); }
+        private VPDLSetting _vpdlSetting;
         public GeneralSetting GeneralSetting { get => _generalSetting; set => SetProperty(ref _generalSetting, value); }
-        public DataSetting DataSetting { get => _dataSetting; set => SetProperty(ref _dataSetting, value); }
-        public IOSetting IOSetting { get => _ioSetting; set => SetProperty(ref _ioSetting, value); }
         public VisionProSetting VisionProSetting { get => _visionProSetting; set => SetProperty(ref _visionProSetting, value); }
-        public DataBaseSetting DataBaseSetting { get => _dataBaseSetting; set => SetProperty(ref _dataBaseSetting, value); }
-
+        public VPDLSetting VPDLSetting { get => _vpdlSetting; set => SetProperty(ref _vpdlSetting,value); }
     }
 }

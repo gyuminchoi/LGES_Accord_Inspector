@@ -11,11 +11,8 @@ namespace Service.Camera.Models
     public interface ICamera : IDisposable
     { 
         CameraConfig CamConfig { get; set; }
-        bool IsEnqueue { get; set; }
-        ConcurrentQueue<byte[]> RawDatas { get; set; }
-        event EventHandler<string> ReceiveRawDataEnqueueComplete;
-        //ConcurrentQueue<Bitmap> ReceiveImageDatas { get; set; }
-        //event EventHandler<string> ReceiveImageDataEnqueueComplete;
+        ConcurrentQueue<Bitmap> ReceiveImageDatas { get; set; }
+        event EventHandler<string> ReceiveImageDataEnqueueComplete;
         int MaxEnqueueCount { get; set; }
         void Open(bool isReConnect);
         void Close();
@@ -27,7 +24,7 @@ namespace Service.Camera.Models
         void GrabStart();
         void GrabStop();
         void SWTriggerExecute(ICamera cam);
-        void ContinueSWTrigExecute();
+        void ContinueSWTrigExecute(object cyleTime);
         void StopContinueTrigExecute();
         ulong GetPacketLossCount();
 

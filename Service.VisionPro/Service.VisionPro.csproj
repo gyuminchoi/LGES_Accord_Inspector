@@ -110,14 +110,6 @@
       <Project>{0C853BAC-42CD-43AF-9EF3-2E34A1D2A33F}</Project>
       <Name>Service.CustomException</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Service.Database\Service.Database.csproj">
-      <Project>{CE51A3AD-9CE7-4F82-9A32-59575BC61038}</Project>
-      <Name>Service.Database</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Service.ImageMerge\Service.ImageMerge.csproj">
-      <Project>{72b5b909-5d50-4aeb-9eb5-afe6720837c0}</Project>
-      <Name>Service.ImageMerge</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Service.Logger\Service.Logger.csproj">
       <Project>{E0E1686B-BD6D-4CC3-B44A-E85CF9419CDA}</Project>
       <Name>Service.Logger</Name>
@@ -125,10 +117,6 @@
     <ProjectReference Include="..\Service.Pattern\Service.Pattern.csproj">
       <Project>{7CDA4A51-DE38-4DDD-BF00-53C9EAFA72AD}</Project>
       <Name>Service.Pattern</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Service.Setting\Service.Setting.csproj">
-      <Project>{F2BDFF7C-F3BD-4AA8-9C93-8F118C6EA039}</Project>
-      <Name>Service.Setting</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

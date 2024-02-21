@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace BarcodeLabel.Core.Services
+namespace CREVIS_SWIR_Inspector.Core.Services
 {
     public class BindingCommand : ICommand
     {

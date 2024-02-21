@@ -112,9 +112,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BarcodeLabel.Core\BarcodeLabel.Core.csproj">
+    <ProjectReference Include="..\BarcodeLabel.Core\CREVIS_SWIR_Inspector.Core.csproj">
       <Project>{70C5B44D-0A6C-4679-9545-9F8D0EB18697}</Project>
-      <Name>BarcodeLabel.Core</Name>
+      <Name>CREVIS_SWIR_Inspector.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Service.Camera\Service.Camera.csproj">
       <Project>{17F19850-AC0F-4D11-ADA7-9809837BE78B}</Project>
@@ -131,10 +131,6 @@
     <ProjectReference Include="..\Service.Postprocessing\Service.Postprocessing.csproj">
       <Project>{e02aed11-1ab5-4bc8-8e81-8d0923aa81af}</Project>
       <Name>Service.Postprocessing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Service.VisionPro\Service.VisionPro.csproj">
-      <Project>{6E66EBDC-E859-4F69-B72B-B445E41BE3F7}</Project>
-      <Name>Service.VisionPro</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

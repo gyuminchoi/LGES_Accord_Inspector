@@ -1,6 +1,0 @@
-﻿<ResourceDictionary
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Service.IOController;component/Themes/Units/IOController.xaml"/>
-    </ResourceDictionary.MergedDictionaries>
-</ResourceDictionary>

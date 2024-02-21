@@ -1,14 +1,7 @@
 ﻿using Service.Camera.Models;
+using Service.DeepLearning.Services;
 using Service.Postprocessing.Services;
-using Service.Save.Services;
-using Service.Setting.Models;
-using Service.VisionPro.Services;
-using Services.ImageMerge.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service.MainInspection.Services
 {
@@ -16,9 +9,9 @@ namespace Service.MainInspection.Services
     {
         bool IsRun { get; set; }
 
-        void Initialize(ICameraManager cm, IImageMergeManager imm, IVisionProManager vpm, IPostprocessingManager ppm, ISaveManager sm);
+        void Initialize(ICameraManager cm, IVPDLManager vpdlm, IPostprocessingManager ppm);
 
-        void Run(VisionProRecipe recipe);
+        void Run();
 
         void Stop();
 

@@ -98,51 +98,51 @@ namespace Dialog.AppSetting.ViewModels
         {
             PathType pathType = (PathType)type;
             string path = null;
-            switch (pathType)
-            {
-                case PathType.InspectionImageSavePath:
-                    path = GetFolderPath();
-                    if (path != null)
-                        SettingManager.AppSetting.ImageSetting.InspectionImageSavePath = path;
-                    return;
+            //switch (pathType)
+            //{
+            //    case PathType.InspectionImageSavePath:
+            //        path = GetFolderPath();
+            //        if (path != null)
+            //            SettingManager.AppSetting.ImageSetting.InspectionImageSavePath = path;
+            //        return;
 
-                case PathType.LiveImageSavePath:
-                    path = GetFolderPath();
-                    if(path != null)
-                        SettingManager.AppSetting.ImageSetting.LiveImageSavePath = path;
-                    return;
+            //    case PathType.LiveImageSavePath:
+            //        path = GetFolderPath();
+            //        if(path != null)
+            //            SettingManager.AppSetting.ImageSetting.LiveImageSavePath = path;
+            //        return;
 
-                case PathType.DataSavePath:
-                    path = GetFolderPath();
-                    if(path !=  null)
-                        SettingManager.AppSetting.DataSetting.SavePath = path;
-                    return;
+            //    case PathType.DataSavePath:
+            //        path = GetFolderPath();
+            //        if(path !=  null)
+            //            SettingManager.AppSetting.DataSetting.SavePath = path;
+            //        return;
 
-                case PathType.DataSendPath: 
-                    path = GetFolderPath();
-                    if (path != null)
-                        SettingManager.AppSetting.DataSetting.SendPath = path;
-                    return;
+            //    case PathType.DataSendPath: 
+            //        path = GetFolderPath();
+            //        if (path != null)
+            //            SettingManager.AppSetting.DataSetting.SendPath = path;
+            //        return;
 
-                case PathType.VisionProPatMaxToolPath:
-                    path = GetFilePath(".vpp");
+            //    case PathType.VisionProPatMaxToolPath:
+            //        path = GetFilePath(".vpp");
 
-                    if (path != null)
-                        SelectedRecipe.PatMaxToolPath = path;
-                    return;
+            //        if (path != null)
+            //            SelectedRecipe.PatMaxToolPath = path;
+            //        return;
 
-                case PathType.VisionProAffineToolPath:
-                    path = GetFilePath(".vpp");
-                    if (path != null)
-                        SelectedRecipe.AffineToolPath = path;
-                    return;
+            //    case PathType.VisionProAffineToolPath:
+            //        path = GetFilePath(".vpp");
+            //        if (path != null)
+            //            SelectedRecipe.AffineToolPath = path;
+            //        return;
 
-                case PathType.VisionProIDToolPath:
-                    path = GetFilePath(".vpp");
-                    if (path != null)
-                        SelectedRecipe.IDToolPath = path;
-                    return;
-            }
+            //    case PathType.VisionProIDToolPath:
+            //        path = GetFilePath(".vpp");
+            //        if (path != null)
+            //            SelectedRecipe.IDToolPath = path;
+            //        return;
+            //}
         }
 
         private string GetFolderPath()

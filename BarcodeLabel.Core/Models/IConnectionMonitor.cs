@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BarcodeLabel.Core.Models
+namespace CREVIS_SWIR_Inspector.Core.Models
 {
     public interface IConnectionMonitor
     {

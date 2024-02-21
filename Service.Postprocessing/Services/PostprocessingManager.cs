@@ -1,38 +1,17 @@
-﻿using Service.Setting.Models;
-using Service.VisionPro.Models;
-using Service.VisionPro.Services;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Service.Postprocessing.Services
 {
     public class PostprocessingManager : IPostprocessingManager
     {
-        private IVisionProManager _vpManager;
         public Dictionary<string, Postprocessor> ProcessorDic { get; set; } = new Dictionary<string, Postprocessor>();
 
-        public PostprocessingManager()
-        {
-        }
+        public PostprocessingManager() { }
 
-        public void Initialize(IVisionProManager vpm)
+        public void Initialize()
         {
-            _vpManager = vpm;
-
-            ProcessorDic.Add("Top", new Postprocessor(_vpManager.InspectorDic["Top"].VisionProResultQueue));
-            ProcessorDic.Add("Bottom", new Postprocessor(_vpManager.InspectorDic["Bottom"].VisionProResultQueue));
-        }
-
-        public void Load(VisionProRecipe recipe)
-        {
-            foreach (var processor in ProcessorDic.Values) 
-            {
-                processor.RecipeLoad(recipe);
-            }
+            ProcessorDic.Add("SWIR", new Postprocessor());
+            ProcessorDic.Add("Standard", new Postprocessor());
         }
 
         public void Start()
@@ -58,7 +37,5 @@ namespace Service.Postprocessing.Services
                 processor.Dispose();
             }
         }
-
-        
     }
 }

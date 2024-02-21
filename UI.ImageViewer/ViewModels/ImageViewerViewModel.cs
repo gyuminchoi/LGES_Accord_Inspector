@@ -1,4 +1,4 @@
-﻿using BarcodeLabel.Core.Events;
+﻿using CREVIS_SWIR_Inspector.Core.Events;
 using Prism.Events;
 using Prism.Mvvm;
 using Service.Camera.Models;
@@ -21,39 +21,33 @@ namespace UI.ImageViewer.ViewModels
     public class ImageViewerViewModel : BindableBase
     {
         #region 필드
-        private int _topBoxCount = 0;
-        private int _topBarcodeCount = 0;
-        private WriteableBitmap _topOverlayImg;
-        private int _bottomBoxCount = 0;
-        private int _bottomBarcodeCount = 0;
-        private WriteableBitmap _bottomOverlayImg;
         private IEventAggregator _eventAggregator;
         private IPostprocessingManager _ppManager;
         private ICameraManager _camManager;
         private ServicesInitCompleteEvent _servicesInitCompleteEvent;
         private LogWrite _logWrite = LogWrite.Instance;
-        private int _topCount = 0;
-        private int _botCount = 0;
-        private bool _topIsPass;
-        private bool _botIsPass;
+
+        private WriteableBitmap _swirOriginImg;
+        private WriteableBitmap _swirOverlayImg;
+        private int _swirCount = 0;
+
+        private WriteableBitmap _standardOriginImg;
+        private WriteableBitmap _standardOverlayImg;
+        private int _standardCount = 0;
         #endregion
 
         #region 프로퍼티
-        // Top
-        public int TopBoxCount { get => _topBoxCount; set => SetProperty(ref _topBoxCount, value); }
-        public int TopBarcodeCount { get => _topBarcodeCount; set => SetProperty(ref _topBarcodeCount, value); }
-        public WriteableBitmap TopOverlayImg { get => _topOverlayImg; set => SetProperty(ref _topOverlayImg, value); }
-        public int TopCount { get => _topCount; set => SetProperty(ref _topCount, value); }
-        public bool TopIsPass { get => _topIsPass; set => SetProperty(ref _topIsPass, value); }
+        // SWIR
+        public WriteableBitmap SWIROriginImg { get => _swirOriginImg; set => SetProperty(ref _swirOriginImg, value); }
+        public WriteableBitmap SWIROverlayImg { get => _swirOverlayImg; set => SetProperty(ref _swirOverlayImg, value); }
+        public int SWIRCount { get => _swirCount; set => SetProperty(ref _swirCount, value); }
 
-        // Bot
-        public int BottomBoxCount { get => _bottomBoxCount; set => SetProperty(ref _bottomBoxCount, value); }
-        public int BottomBarcodeCount { get => _bottomBarcodeCount; set => SetProperty(ref _bottomBarcodeCount, value); }
-        public WriteableBitmap BottomOverlayImg { get => _bottomOverlayImg; set => SetProperty(ref _bottomOverlayImg, value); }
-        public int BotCount { get => _botCount; set => SetProperty(ref _botCount, value); }
-        public bool BotIsPass { get => _botIsPass; set => SetProperty(ref _botIsPass, value); }
+        // Standard
+        public WriteableBitmap StandardOriginImg { get => _standardOriginImg; set => SetProperty(ref _standardOriginImg, value); }
+        public WriteableBitmap StandardOverlayImg { get => _standardOverlayImg; set => SetProperty(ref _standardOverlayImg, value); }
+        public int StandardCount { get => _standardCount; set => SetProperty(ref _standardCount, value); }
 
-        private int _bufferSize = 0;
+        
         #endregion
 
         #region 생성자
@@ -62,6 +56,7 @@ namespace UI.ImageViewer.ViewModels
             _eventAggregator = ea;
             _ppManager = ppm;
             _camManager = cm;
+
             _servicesInitCompleteEvent = _eventAggregator.GetEvent<ServicesInitCompleteEvent>();
             _servicesInitCompleteEvent.Subscribe(OnSubscribeEvent);
         }
@@ -71,68 +66,62 @@ namespace UI.ImageViewer.ViewModels
         #region 메서드
         private void OnSubscribeEvent()
         {
-            _ppManager.ProcessorDic["Top"].DisplayUpdateEvent += OnTopUIUpdate;
-            _ppManager.ProcessorDic["Bottom"].DisplayUpdateEvent += OnBottomUIUpdate;
+            try
+            {
+                
+                _ppManager.ProcessorDic["SWIR"].DisplayUpdateEvent += OnSWIRUIUpdate;
+                _ppManager.ProcessorDic["Standard"].DisplayUpdateEvent += OnStandardUIUpdate;
 
-            ICamera cam = _camManager.CameraDic.Values.First();
-            TopOverlayImg = new WriteableBitmap(cam.CamConfig.Height * 2, cam.CamConfig.Width, 96, 96, PixelFormats.Rgb24, null);
-            BottomOverlayImg = new WriteableBitmap(cam.CamConfig.Height * 2, cam.CamConfig.Width, 96, 96, PixelFormats.Rgb24, null);
-            _bufferSize = cam.CamConfig.Buffersize * 6;
+                ICamera swirCam = _camManager.CameraDic["SWIR"];
+                ICamera standardCam = _camManager.CameraDic["Standard"];
 
-            ////TODO : test
-            //Bitmap bmp1 = new Bitmap(@"C:\Users\TSgyuminChoi\Desktop\대원제약 검토 자료\1101\Test2\Bot Result\1.bmp");
-            //IntPtr pImage = BitmapToPtr(bmp1);
+                SWIROriginImg = new WriteableBitmap(swirCam.CamConfig.Height, swirCam.CamConfig.Width, 96, 96, PixelFormats.Indexed8, BitmapPalettes.Gray256);
+                SWIROverlayImg = new WriteableBitmap(swirCam.CamConfig.Height, swirCam.CamConfig.Width, 96, 96, PixelFormats.Rgb24, null);
 
-            //TopOverlayImg.Lock();
-            //CopyMemory(TopOverlayImg.BackBuffer, pImage, (uint)_bufferSize);
-            //TopOverlayImg.AddDirtyRect(new Int32Rect(0, 0, TopOverlayImg.PixelWidth, TopOverlayImg.PixelHeight));
-            //TopOverlayImg.Unlock();
-
-            //BottomOverlayImg.Lock();
-            //CopyMemory(BottomOverlayImg.BackBuffer, pImage, (uint)_bufferSize);
-            //BottomOverlayImg.AddDirtyRect(new Int32Rect(0, 0, BottomOverlayImg.PixelWidth, BottomOverlayImg.PixelHeight));
-            //BottomOverlayImg.Unlock();
-
-            TopIsPass = false;
-            BotIsPass = true;
-        }
-        //TODO :Test
-        public IntPtr BitmapToPtr(Bitmap bitmap)
-        {
-            BitmapData bmpdata = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
-            bitmap.UnlockBits(bmpdata);
-            return bmpdata.Scan0;
+                StandardOriginImg = new WriteableBitmap(standardCam.CamConfig.Height, standardCam.CamConfig.Width, 96, 96, PixelFormats.Indexed8, BitmapPalettes.Gray256);
+                StandardOverlayImg = new WriteableBitmap(standardCam.CamConfig.Height, standardCam.CamConfig.Width, 96, 96, PixelFormats.Rgb24, null);
+            }
+            catch (Exception err)
+            {
+                _logWrite?.Error(err);
+            }
+            
         }
 
-        private void OnTopUIUpdate(DisplayData displayData)
+        private void OnSWIRUIUpdate(DisplayData displayData)
         {
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                TopOverlayImg.Lock();
-                CopyMemory(TopOverlayImg.BackBuffer, displayData.PImage, (uint)_bufferSize);
-                TopOverlayImg.AddDirtyRect(new Int32Rect(0, 0, TopOverlayImg.PixelWidth, TopOverlayImg.PixelHeight));
-                TopOverlayImg.Unlock();
+                SWIROriginImg.Lock();
+                CopyMemory(SWIROriginImg.BackBuffer, displayData.OriginPImage, (uint)_camManager.CameraDic["SWIR"].CamConfig.Buffersize);
+                SWIROriginImg.AddDirtyRect(new Int32Rect(0, 0, SWIROriginImg.PixelWidth, SWIROriginImg.PixelHeight));
+                SWIROriginImg.Unlock();
+
+                SWIROverlayImg.Lock();
+                CopyMemory(SWIROverlayImg.BackBuffer, displayData.OverlayPImage, (uint)_camManager.CameraDic["SWIR"].CamConfig.Buffersize * 3);
+                SWIROverlayImg.AddDirtyRect(new Int32Rect(0, 0, SWIROverlayImg.PixelWidth, SWIROverlayImg.PixelHeight));
+                SWIROverlayImg.Unlock();
             }));
 
-            TopIsPass = displayData.IsPass;
-            TopBoxCount = displayData.BoxCount;
-            TopBarcodeCount = displayData.BarcodeCount;
-            TopCount++;
+            SWIRCount++;
         }
 
-        private void OnBottomUIUpdate(DisplayData displayData)
+        private void OnStandardUIUpdate(DisplayData displayData)
         {
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                BottomOverlayImg.Lock();
-                CopyMemory(BottomOverlayImg.BackBuffer, displayData.PImage, (uint)_bufferSize);
-                BottomOverlayImg.AddDirtyRect(new Int32Rect(0, 0, BottomOverlayImg.PixelWidth, BottomOverlayImg.PixelHeight));
-                BottomOverlayImg.Unlock();
+                StandardOriginImg.Lock();
+                CopyMemory(StandardOriginImg.BackBuffer, displayData.OriginPImage, (uint)_camManager.CameraDic["Standard"].CamConfig.Buffersize);
+                StandardOriginImg.AddDirtyRect(new Int32Rect(0, 0, StandardOriginImg.PixelWidth, StandardOriginImg.PixelHeight));
+                StandardOriginImg.Unlock();
+
+                StandardOverlayImg.Lock();
+                CopyMemory(StandardOverlayImg.BackBuffer, displayData.OverlayPImage, (uint)_camManager.CameraDic["Standard"].CamConfig.Buffersize * 3);
+                StandardOverlayImg.AddDirtyRect(new Int32Rect(0, 0, StandardOverlayImg.PixelWidth, StandardOverlayImg.PixelHeight));
+                StandardOverlayImg.Unlock();
             }));
-            BotIsPass = displayData.IsPass;
-            BottomBoxCount = displayData.BoxCount;
-            BottomBarcodeCount = displayData.BarcodeCount;
-            BotCount++;
+              
+            StandardCount++;
         }
 
         [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]

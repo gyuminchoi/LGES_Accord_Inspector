@@ -29,8 +29,9 @@ namespace Service.Setting.Services
                 AppSetting = InitializeAppSetting();
 
                 Save();
-                return;
             }
+
+            Load();
         }
 
         public void Load()
@@ -47,50 +48,21 @@ namespace Service.Setting.Services
 
         private AppSetting InitializeAppSetting()
         {
-            string barcodeColor = "Green";
-            string boxColor = "Blue";
-            Dictionary<string, VisionProRecipe> recipes = new Dictionary<string, VisionProRecipe>
-            {
-                { "3x8", new VisionProRecipe(@"D:\Daewon", @"D:\Daewon", @"D:\Daewon", 12, 4, 2, 1, 10, 400, 200, barcodeColor, boxColor) },
-                { "4x10", new VisionProRecipe(@"D:\Daewon", @"D:\Daewon", @"D:\Daewon", 20, 10, 2, 1, 10, 400, 200, barcodeColor, boxColor) },
-            };
-
             return new AppSetting()
             {
-                ImageSetting = new ImageSetting(
-                    isCompression: true,
-                    isSaveImage: true,
-                    inspectionImageSavePath: @"D:\Daewon",
-                    liveImageSavePath: @"D:\Daewon"),
-
                 GeneralSetting = new GeneralSetting(
                     logSavePath: _logWrite.SavePath),
 
-                DataSetting = new DataSetting(
-                    savePath: @"D:\Daewon",
-                    sendPath: @"D:\Daewon"),
-
-                IOSetting = new IOSetting() 
+                //VisionProSetting = new VisionProSetting(
+                //    recipes: recipes),
+                VPDLSetting = new VPDLSetting()
                 {
-                    IPAddress = "192.168.100.100",
-                    Cam1Trigger = new IOData() { Slot = 0, Index = 0 },
-                    Cam2Trigger = new IOData() { Slot = 0, Index = 1 },
-                    Cam3Trigger = new IOData() { Slot = 0, Index = 2 },
-                    Cam4Trigger = new IOData() { Slot = 0, Index = 3 },
-                    Cam1RetryTrig = new IOData() { Slot = 0, Index = 4 },
-                    Cam2RetryTrig = new IOData() { Slot = 0, Index = 5 },
-                    Cam3RetryTrig = new IOData() { Slot = 0, Index = 6 },
-                    Cam4RetryTrig = new IOData() { Slot = 0, Index = 7 },
-                },
-
-                VisionProSetting = new VisionProSetting( 
-                    recipes: recipes),
-
-                DataBaseSetting = new DataBaseSetting(
-                    path: Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Assembly.GetEntryAssembly().GetName().Name,"Daewon_History.db"),
-                    tableName:"InspectionResult",
-                    csvPath: Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Assembly.GetEntryAssembly().GetName().Name,@"\CSV\"))
-            };
+                    WorkspacePath = @"C:\Users\TSgyuminChoi\Desktop\SWIR\SWIR_Workspace.vrws",
+                    Workspacename = @"SWIR_Workspace",
+                    StreamName = "default",
+                    ToolName = "Analyze",
+                }
+              };
         }
     }
 }
