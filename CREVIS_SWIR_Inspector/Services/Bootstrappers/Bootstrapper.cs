@@ -12,6 +12,7 @@ using Service.Logger.Services;
 using Service.MainInspection.Services;
 using Service.Postprocessing.Services;
 using Service.Setting.Services;
+using Service.VisionPro.Services;
 using System;
 using System.Reflection;
 using System.Threading;
@@ -35,7 +36,7 @@ namespace CREVIS_SWIR_Inspector.Main.Services.Bootstrappers
             containerRegistry.RegisterSingleton<IPostprocessingManager, PostprocessingManager>();
             containerRegistry.RegisterSingleton<IMainInpectionManager, MainInspectionManager>();
             containerRegistry.RegisterSingleton<ISettingManager, SettingManager>();
-            containerRegistry.RegisterSingleton<IVPDLManager, VPDLManager>();
+            containerRegistry.RegisterSingleton<IVisionProManager, VisionProManager>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
@@ -63,13 +64,13 @@ namespace CREVIS_SWIR_Inspector.Main.Services.Bootstrappers
             camManager.Opens();
             _logWrite.Info("Initialize Camera Manager Complete!");
 
-            IVPDLManager vpdlManager = Container.Resolve<IVPDLManager>();
-            vpdlManager.Initialize(settingManager);
-            _logWrite.Info("Initialize VPDL Manager Complete!");
+            //IVPDLManager vpdlManager = Container.Resolve<IVPDLManager>();
+            //vpdlManager.Initialize(settingManager);
+            //_logWrite.Info("Initialize VPDL Manager Complete!");
 
-            //IVisionProManager vpManager = Container.Resolve<IVisionProManager>();
-            //vpManager.Initialize();
-            //_logWrite.Info("Initialize VisionPro Manager Complete!");
+            IVisionProManager vpManager = Container.Resolve<IVisionProManager>();
+            vpManager.Initialize();
+            _logWrite.Info("Initialize VisionPro Manager Complete!");
 
             IPostprocessingManager ppManager = Container.Resolve<IPostprocessingManager>();
             ppManager.Initialize();
@@ -79,7 +80,7 @@ namespace CREVIS_SWIR_Inspector.Main.Services.Bootstrappers
             eventAggregator.GetEvent<ServicesInitCompleteEvent>().Publish();
 
             IMainInpectionManager miManager = Container.Resolve<IMainInpectionManager>();
-            miManager.Initialize(camManager, vpdlManager, ppManager);
+            miManager.Initialize(camManager, vpManager, ppManager);
             _logWrite.Info("Initialize main inspection manager!");
 
             sc.Close(TimeSpan.Zero);

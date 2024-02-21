@@ -1,6 +1,7 @@
 ﻿using Service.Camera.Models;
 using Service.DeepLearning.Services;
 using Service.Postprocessing.Services;
+using Service.VisionPro.Services;
 using System;
 
 namespace Service.MainInspection.Services
@@ -9,7 +10,7 @@ namespace Service.MainInspection.Services
     {
         bool IsRun { get; set; }
 
-        void Initialize(ICameraManager cm, IVPDLManager vpdlm, IPostprocessingManager ppm);
+        void Initialize(ICameraManager cm, IVisionProManager vpm, IPostprocessingManager ppm);
 
         void Run();
 

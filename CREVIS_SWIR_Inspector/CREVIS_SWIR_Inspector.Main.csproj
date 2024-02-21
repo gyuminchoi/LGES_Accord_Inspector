@@ -251,10 +251,6 @@
       <Project>{0c853bac-42cd-43af-9ef3-2e34a1d2a33f}</Project>
       <Name>Service.CustomException</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Service.DeepLearning\Service.DeepLearning.csproj">
-      <Project>{7E167001-57CE-4274-9D6E-1A9DFAEFA9CD}</Project>
-      <Name>Service.DeepLearning</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Service.Drawing\Service.Drawing.csproj">
       <Project>{320d746d-2e95-4b08-a758-fdddaec98198}</Project>
       <Name>Service.Drawing</Name>

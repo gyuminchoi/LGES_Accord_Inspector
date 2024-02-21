@@ -73,10 +73,6 @@
       <Project>{17F19850-AC0F-4D11-ADA7-9809837BE78B}</Project>
       <Name>Service.Camera</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Service.DeepLearning\Service.DeepLearning.csproj">
-      <Project>{7E167001-57CE-4274-9D6E-1A9DFAEFA9CD}</Project>
-      <Name>Service.DeepLearning</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Service.Drawing\Service.Drawing.csproj">
       <Project>{320d746d-2e95-4b08-a758-fdddaec98198}</Project>
       <Name>Service.Drawing</Name>

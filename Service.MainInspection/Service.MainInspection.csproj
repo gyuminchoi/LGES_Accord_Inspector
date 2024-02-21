@@ -69,10 +69,6 @@
       <Project>{17F19850-AC0F-4D11-ADA7-9809837BE78B}</Project>
       <Name>Service.Camera</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Service.DeepLearning\Service.DeepLearning.csproj">
-      <Project>{7E167001-57CE-4274-9D6E-1A9DFAEFA9CD}</Project>
-      <Name>Service.DeepLearning</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Service.Logger\Service.Logger.csproj">
       <Project>{E0E1686B-BD6D-4CC3-B44A-E85CF9419CDA}</Project>
       <Name>Service.Logger</Name>
@@ -84,6 +80,10 @@
     <ProjectReference Include="..\Service.Postprocessing\Service.Postprocessing.csproj">
       <Project>{E02AED11-1AB5-4BC8-8E81-8D0923AA81AF}</Project>
       <Name>Service.Postprocessing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service.VisionPro\Service.VisionPro.csproj">
+      <Project>{6E66EBDC-E859-4F69-B72B-B445E41BE3F7}</Project>
+      <Name>Service.VisionPro</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
