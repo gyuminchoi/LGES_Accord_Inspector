@@ -150,7 +150,7 @@ namespace Service.Postprocessing.Services
         //private void CreateBarcodeRectangle(List<RectangleF> rectList, Barcode barcodeInfo, VisionProRecipe recipe)
         //{
         //    Barcode barcode = barcodeInfo;
-        //    PointF barcodePoint = new PointF((float)barcode.X - (recipe.BarcodeWidth / 2) , (float)barcode.Y - (recipe.BarcodeHeight / 2));
+        //    PointF barcodePoint = new PointF((float)barcode.X - (recipe.BarcodeWidth / 2), (float)barcode.Y - (recipe.BarcodeHeight / 2));
         //    SizeF barcodesize = new SizeF(recipe.BarcodeWidth, recipe.BarcodeHeight);
 
         //    rectList.Add(new RectangleF(barcodePoint, barcodesize));
