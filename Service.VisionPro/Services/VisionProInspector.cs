@@ -8,6 +8,7 @@ using Service.Logger.Services;
 using Service.VisionPro.Models;
 using System;
 using System.Collections.Concurrent;
+using System.Drawing;
 using System.IO;
 using System.Threading;
 
@@ -19,9 +20,6 @@ namespace Service.VisionPro.Services
         private LogWrite _logWrite = LogWrite.Instance;
 
         private Thread _inspectThread = new Thread(() => { });
-        private CogPMAlignTool _patMaxTool;
-        private CogAffineTransformTool _affineTool;
-        private CogIDTool _idTool;
 
         public ConcurrentQueue<VisionProResult> VisionProResultQueue { get; set; } = new ConcurrentQueue<VisionProResult>();
         public bool IsRun { get; set; } = false;
@@ -45,9 +43,9 @@ namespace Service.VisionPro.Services
 
                 IsRun = true;
 
-                _inspectThread = new Thread(new ThreadStart(InspectionProcess));
-                _inspectThread.Name = "VisionPro Inspection Thread";
-                _inspectThread.Start();
+                //_inspectThread = new Thread(new ThreadStart(InspectionProcess));
+                //_inspectThread.Name = "VisionPro Inspection Thread";
+                //_inspectThread.Start();
             }
             catch (Exception err)
             {
@@ -57,10 +55,16 @@ namespace Service.VisionPro.Services
             }
         }
 
-        private void InspectionProcess()
+        public VisionProResult VisionProInspection(Bitmap bmp)
         {
-            throw new NotImplementedException();
+            //TODO : 작성해야함
+            return new VisionProResult();
         }
+
+        //private void InspectionProcess()
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public void Stop()
         {
@@ -275,33 +279,11 @@ namespace Service.VisionPro.Services
             baseTool.Run();
         }
 
-        private void DisposeTools()
-        {
-            if (_patMaxTool != null) 
-            {
-                _patMaxTool.Dispose();
-                _patMaxTool= null;
-            } 
-            
-            if (_idTool != null)
-            {
-                _idTool.Dispose();
-                _idTool = null;
-            }
-
-            if (_affineTool != null)
-            {
-                _affineTool.Dispose();
-                _affineTool = null;
-            }
-        }
-
         public void Dispose()
         {
             try 
             {
                 Stop();
-                DisposeTools();
             } 
             catch { }
         }

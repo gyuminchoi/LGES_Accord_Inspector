@@ -2,12 +2,14 @@
 using Service.Logger.Services;
 using Service.Postprocessing.Models;
 using Service.Postprocessing.Services;
+using Service.VisionPro.Models;
 using Service.VisionPro.Services;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Service.MainInspection.Services
 {
@@ -20,8 +22,6 @@ namespace Service.MainInspection.Services
         private Thread _mainInspectionThread = new Thread(() => { });
         private AutoResetEvent _receiveDataSyncEvent = new AutoResetEvent(false);
 
-        public delegate void SWIRDisplayUpdateDelegate(DisplayData displayData);
-        public event SWIRDisplayUpdateDelegate DisplayUpdateEvent;
         public bool IsRun { get; set; } = false;
 
         public void Initialize(ICameraManager cm, IVisionProManager vpm, IPostprocessingManager ppm)
@@ -116,7 +116,7 @@ namespace Service.MainInspection.Services
 
             while (IsRun)
             {
-                if (!_receiveDataSyncEvent.WaitOne(2000))
+                if (!_receiveDataSyncEvent.WaitOne(3000))
                 {
                     continue;
                 }
@@ -126,22 +126,22 @@ namespace Service.MainInspection.Services
 
                 ResetReceiveImageDataQueue(_camManager);
 
-                //Task<VPDLResult> swirInspection = Task.Run(() => _vpdlManager.VPDLInspect(swirBmp));
-                //Task<VPDLResult> stdInspection = Task.Run(() => _vpdlManager.VPDLInspect(stdBmp));
+                Task<VisionProResult> swirInspection = Task.Run(() => _vpManager.InspectorDic["SWIR"].VisionProInspection(swirBmp));
+                Task<VisionProResult> stdInspection = Task.Run(() => _vpManager.InspectorDic["Standard"].VisionProInspection(stdBmp));
 
-                //// 검사가 완료될 때까지 대기
-                //swirInspection.Wait();
-                //stdInspection.Wait();
+                // 검사가 완료될 때까지 대기
+                swirInspection.Wait();
+                stdInspection.Wait();
 
-                //// 후처리 후 UI 업데이트까지 진행
-                //Task swirPostProcess = Task.Run(() => _ppManager.ProcessorDic["SWIR"].PostProcess(swirInspection.Result));
-                //Task stdPostProcess = Task.Run(() => _ppManager.ProcessorDic["Standard"].PostProcess(stdInspection.Result));
+                // 후처리 후 UI 업데이트까지 진행
+                Task swirPostProcess = Task.Run(() => _ppManager.ProcessorDic["SWIR"].PostProcess(swirInspection.Result));
+                Task stdPostProcess = Task.Run(() => _ppManager.ProcessorDic["Standard"].PostProcess(stdInspection.Result));
 
-                //swirPostProcess.Wait();
-                //stdPostProcess.Wait();
+                swirPostProcess.Wait();
+                stdPostProcess.Wait();
 
-                //swirInspection.Result.Dispose();
-                //stdInspection.Result.Dispose();
+                swirInspection.Result.Dispose();
+                stdInspection.Result.Dispose();
             }
         }
 

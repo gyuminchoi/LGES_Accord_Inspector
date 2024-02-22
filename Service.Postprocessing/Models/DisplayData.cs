@@ -9,7 +9,6 @@ namespace Service.Postprocessing.Models
 {
     public class DisplayData
     {
-        public IntPtr OriginPImage { get; set; }
         public IntPtr OverlayPImage { get; set; }
         public bool IsPass { get; set; }
     }

@@ -97,8 +97,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Barcode.cs" />
-    <Compile Include="Models\Box.cs" />
     <Compile Include="Models\VisionProResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\IVisionProManager.cs" />

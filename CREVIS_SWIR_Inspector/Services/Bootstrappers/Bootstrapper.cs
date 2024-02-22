@@ -7,7 +7,6 @@ using Prism.Modularity;
 using Prism.Mvvm;
 using Service.Camera.Models;
 using Service.Camera.Services;
-using Service.DeepLearning.Services;
 using Service.Logger.Services;
 using Service.MainInspection.Services;
 using Service.Postprocessing.Services;
@@ -63,10 +62,6 @@ namespace CREVIS_SWIR_Inspector.Main.Services.Bootstrappers
             ICameraManager camManager = Container.Resolve<ICameraManager>();
             camManager.Opens();
             _logWrite.Info("Initialize Camera Manager Complete!");
-
-            //IVPDLManager vpdlManager = Container.Resolve<IVPDLManager>();
-            //vpdlManager.Initialize(settingManager);
-            //_logWrite.Info("Initialize VPDL Manager Complete!");
 
             IVisionProManager vpManager = Container.Resolve<IVisionProManager>();
             vpManager.Initialize();
